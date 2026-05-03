@@ -158,6 +158,26 @@ The first-pass MHW definition is: SST above the daily 90th percentile threshold
 for at least 5 consecutive valid days. Missing dates and all-NaN dates break
 events.
 
+Generate first-pass MHW figures and area-mean trend tables:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/33_make_mhw_figures.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
+```
+
+This writes:
+
+```text
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_area_mean_annual_timeseries.png
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_mean_total_days_1991_2021.png
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_total_days_trend_per_decade.png
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_cumulative_intensity_trend_per_decade.png
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_mean_max_intensity_1991_2021.png
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_area_mean_trend_summary.csv
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_area_mean_trend_summary.json
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_figure_manifest.json
+```
+
 ## Download external climate drivers
 
 Download and align the lightweight driver data used for explanatory modeling:
