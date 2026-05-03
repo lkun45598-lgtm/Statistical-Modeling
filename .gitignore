@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments and local settings
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Generated data and model artifacts
+data/processed/
+outputs/
+outputs_toy/
+*.zarr/
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.npy
+
+# Large local competition/data products live outside this repo
+osita_data/
+external_drivers/
+
+# Local agent/session metadata and competition form attachments
+AGENTS.md
+2026年全国大学生统计建模大赛附件/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.part
+.DS_Store

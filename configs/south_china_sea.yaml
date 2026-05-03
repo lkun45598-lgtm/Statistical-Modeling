@@ -1,0 +1,89 @@
+project:
+  name: reefcastnet_scs_weekly
+  seed: 42
+  output_dir: outputs
+
+region:
+  # South China Sea broad crop. Use smaller bounds for quick debugging.
+  lat_min: 0.0
+  lat_max: 25.0
+  lon_min: 100.0
+  lon_max: 125.0
+
+erddap:
+  base_url: "https://coastwatch.noaa.gov/erddap/griddap"
+  sst_dataset: "noaacrwsstDaily"
+  sst_var: "analysed_sst"
+  anomaly_dataset: "noaacrwsstanomalyDaily"
+  anomaly_var: "CRW_SSTANOMALY"
+  hotspot_dataset: "noaacrwhotspotDaily"
+  hotspot_var: "hotspot"
+  dhw_dataset: "noaacrwdhwDaily"
+  dhw_var: "degree_heating_week"
+  time_suffix: "T12:00:00Z"
+
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  dataset_name: scs_weekly
+  # Final project can use 2010-2025. Start with 2020-2021 for smoke tests.
+  years: [2010, 2025]
+  weekly_freq: "7D"
+  train_years: [2010, 2020]
+  val_years: [2021, 2022]
+  test_years: [2023, 2025]
+  fill_nan: "zero_anomaly"
+  # Set null to train full map. Patches are safer for first run.
+  patch_size: [128, 128]
+  reef_boxes:
+    - ["Dongsha", 20.2, 21.2, 115.5, 117.0]
+    - ["Xisha", 15.5, 17.5, 111.0, 113.5]
+    - ["Zhongsha", 15.0, 16.8, 113.5, 116.0]
+    - ["Nansha", 7.0, 12.5, 112.0, 117.5]
+    - ["Hainan_South", 17.8, 19.2, 108.0, 111.0]
+    - ["Weizhou_Beibu", 20.5, 21.7, 108.5, 110.0]
+  reef_buffer_cells: 4
+
+forecast:
+  input_len: 12
+  output_len: 16
+  lead_weeks: [1, 2, 4, 8, 12, 16]
+  bleaching_threshold_c: 1.0
+  dhw_window_weeks: 12
+
+model:
+  name: reefcastnet_simvp
+  static_channels: ["mmm", "reef_mask", "reef_buffer", "lat", "lon"]
+  hidden_dim: 48
+  encoder_depth: 2
+  temporal_depth: 4
+  decoder_depth: 2
+  kernel_size: 5
+  num_alert_classes: 5
+  use_alert_head: true
+
+loss:
+  reef_weight: 4.0
+  reef_buffer_weight: 2.0
+  ssta_weight: 1.0
+  hotspot_weight: 0.2
+  dhw_weight: 0.35
+  alert_weight: 0.2
+  gradient_weight: 0.05
+  focal_gamma: 2.0
+  dhw_soft_gate_k: 8.0
+
+train:
+  epochs: 50
+  batch_size: 4
+  num_workers: 4
+  lr: 0.0003
+  weight_decay: 0.00001
+  amp: true
+  grad_clip_norm: 1.0
+  save_every: 5
+  early_stop_patience: 12
+
+runtime:
+  device: "cuda"
+  distributed: true
