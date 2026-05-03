@@ -193,6 +193,16 @@ def _add_caption(doc: Document, text: str) -> None:
     _set_run_font(run, size=12)
 
 
+def _find_table_input(block: str) -> Path | None:
+    input_match = re.search(r"\\input\{([^{}]+)\}", block)
+    if input_match:
+        return Path(input_match.group(1))
+    macro_match = re.search(r"\\papertable(?:\[[^\]]+\])?\{([^{}]+)\}", block)
+    if macro_match:
+        return Path(macro_match.group(1))
+    return None
+
+
 def _add_centered_title(doc: Document, text: str, size: float, font: str = "宋体", bold: bool = False) -> None:
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -229,9 +239,9 @@ def _collect_lists(tex: str) -> tuple[list[TableSpec], list[FigureSpec]]:
     for match in re.finditer(r"\\begin\{table\}.*?\\end\{table\}", tex, flags=re.S):
         block = match.group(0)
         caption = _clean_latex(re.search(r"\\caption\{([^{}]+)\}", block).group(1))
-        input_match = re.search(r"\\input\{([^{}]+)\}", block)
-        if input_match:
-            tables.append(TableSpec(caption=caption, table_path=Path(input_match.group(1))))
+        table_path = _find_table_input(block)
+        if table_path:
+            tables.append(TableSpec(caption=caption, table_path=table_path))
     for match in re.finditer(r"\\begin\{figure\}.*?\\end\{figure\}", tex, flags=re.S):
         block = match.group(0)
         captions = re.findall(r"\\caption\{([^{}]+)\}", block)
@@ -285,11 +295,11 @@ def _add_front_matter(doc: Document, tex: str, tables: list[TableSpec], figures:
 
 def _process_table_block(doc: Document, block: str, table_no: int) -> None:
     caption_match = re.search(r"\\caption\{([^{}]+)\}", block)
-    input_match = re.search(r"\\input\{([^{}]+)\}", block)
-    if not caption_match or not input_match:
+    table_path = _find_table_input(block)
+    if not caption_match or not table_path:
         return
     caption = _clean_latex(caption_match.group(1))
-    rows = _parse_table_file(Path(input_match.group(1)))
+    rows = _parse_table_file(table_path)
     _add_caption(doc, f"表{table_no}  {caption}")
     _add_word_table(doc, rows)
 

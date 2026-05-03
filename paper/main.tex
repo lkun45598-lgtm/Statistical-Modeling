@@ -6,6 +6,7 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{adjustbox}
 \usepackage{amsmath,amssymb}
 \usepackage{longtable}
 \usepackage{caption}
@@ -20,6 +21,17 @@
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0pt}
 \setstretch{1.45}
+
+\newcommand{\papertable}[2][\textwidth]{%
+  \begingroup
+  \zihao{5}
+  \renewcommand{\arraystretch}{1.12}
+  \setlength{\tabcolsep}{4pt}
+  \begin{adjustbox}{max width=#1,center}
+  \input{#2}
+  \end{adjustbox}
+  \endgroup
+}
 
 \newif\ifanonymous
 \ifdefined\ANONYMOUS
@@ -107,7 +119,7 @@
 \begin{table}[H]
 \centering
 \caption{研究数据基本信息}
-\resizebox{\textwidth}{!}{\input{paper/tables/data_summary_table.tex}}
+\papertable{paper/tables/data_summary_table.tex}
 \end{table}
 
 \subsection{数据预处理与缺测处理}
@@ -190,7 +202,7 @@ VIF_j=\frac{1}{1-R_j^2}.
 \begin{table}[H]
 \centering
 \caption{区域平均增暖和海洋热浪风险趋势摘要}
-\resizebox{\textwidth}{!}{\input{paper/tables/trend_summary_table.tex}}
+\papertable{paper/tables/trend_summary_table.tex}
 \end{table}
 
 \subsection{季节循环与空间格局说明阈值建模必要性}
@@ -226,7 +238,7 @@ VIF_j=\frac{1}{1-R_j^2}.
 \begin{table}[H]
 \centering
 \caption{南海分区增暖与海洋热浪趋势摘要}
-\resizebox{\textwidth}{!}{\input{paper/tables/subregion_summary_table.tex}}
+\papertable{paper/tables/subregion_summary_table.tex}
 \end{table}
 
 \begin{figure}[H]
@@ -241,7 +253,7 @@ VIF_j=\frac{1}{1-R_j^2}.
 \begin{table}[H]
 \centering
 \caption{主要指标趋势稳健性检验}
-\resizebox{\textwidth}{!}{\input{paper/tables/robust_trend_table.tex}}
+\papertable{paper/tables/robust_trend_table.tex}
 \end{table}
 
 \begin{figure}[H]
@@ -294,7 +306,7 @@ MHW 的绝对事件数量会随阈值变化，因此本文比较 85\%、90\% 和
 \begin{table}[H]
 \centering
 \caption{MHW 阈值敏感性检验}
-\resizebox{\textwidth}{!}{\input{paper/tables/threshold_sensitivity_table.tex}}
+\papertable{paper/tables/threshold_sensitivity_table.tex}
 \end{table}
 
 \begin{figure}[H]
@@ -309,7 +321,7 @@ MHW 的绝对事件数量会随阈值变化，因此本文比较 85\%、90\% 和
 \begin{table}[H]
 \centering
 \caption{南海分区相对综合海洋热风险指数}
-\resizebox{\textwidth}{!}{\input{paper/tables/heat_risk_index_table.tex}}
+\papertable{paper/tables/heat_risk_index_table.tex}
 \end{table}
 
 \begin{figure}[H]
@@ -328,7 +340,7 @@ MHW 的绝对事件数量会随阈值变化，因此本文比较 85\%、90\% 和
 \begin{table}[H]
 \centering
 \caption{月尺度 SSTA 与驱动因子的最强滞后相关}
-\resizebox{\textwidth}{!}{\input{paper/tables/monthly_driver_best_lag_table.tex}}
+\papertable{paper/tables/monthly_driver_best_lag_table.tex}
 \end{table}
 
 \subsection{标准化回归比较边际解释强度}
@@ -337,7 +349,7 @@ MHW 的绝对事件数量会随阈值变化，因此本文比较 85\%、90\% 和
 \begin{table}[H]
 \centering
 \caption{月尺度 SSTA 标准化解释模型}
-\resizebox{\textwidth}{!}{\input{paper/tables/monthly_driver_regression_table.tex}}
+\papertable{paper/tables/monthly_driver_regression_table.tex}
 \end{table}
 
 年度 MHW 总天数解释模型见表 9 和表 10。模型调整 $R^2$ 为 0.206，风速距平标准化系数为 $-0.558$，$p=0.003$，说明风速偏弱年份更容易对应更长的 MHW 暴露时长。其他大尺度气候指数在年度样本下未通过显著性检验，表明其影响可能更多体现为季节性、区域性或非线性调制。
@@ -345,13 +357,13 @@ MHW 的绝对事件数量会随阈值变化，因此本文比较 85\%、90\% 和
 \begin{table}[H]
 \centering
 \caption{年度 MHW 总天数标准化解释模型}
-\resizebox{\textwidth}{!}{\input{paper/tables/annual_driver_regression_table.tex}}
+\papertable{paper/tables/annual_driver_regression_table.tex}
 \end{table}
 
 \begin{table}[H]
 \centering
 \caption{驱动因子解释模型拟合优度}
-\resizebox{0.72\textwidth}{!}{\input{paper/tables/driver_model_summary_table.tex}}
+\papertable{paper/tables/driver_model_summary_table.tex}
 \end{table}
 
 \subsection{局地风速异常的统计意义与物理解释}
