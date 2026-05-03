@@ -68,6 +68,96 @@ Main local outputs:
 Default crop is `0-25N, 100-125E`, with SST converted from Kelvin to
 `degree_Celsius`.
 
+For the current full South China Sea statistical-modeling workflow, use the
+expanded crop `5S-25N, 100-125E`:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/20_prepare_ostia_scs.py \
+  --output-dir /data1/user/lz/osita_data/scs_5s25n \
+  --lat-min -5 \
+  --lat-max 25 \
+  --lon-min 100 \
+  --lon-max 125 \
+  --workers 128
+```
+
+Current local full-region outputs:
+
+```text
+/data1/user/lz/osita_data/scs_5s25n/ostia_scs_daily.zarr
+/data1/user/lz/osita_data/scs_5s25n/ostia_scs_monthly.zarr
+/data1/user/lz/osita_data/scs_5s25n/metadata.json
+```
+
+## Build monthly statistical products
+
+Generate monthly SST anomaly, area-mean time series, and first-pass trend maps:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/30_build_monthly_sst_products.py \
+  --input-zarr /data1/user/lz/osita_data/scs_5s25n/ostia_scs_monthly.zarr \
+  --output-dir /data1/user/lz/osita_data/scs_5s25n/analysis \
+  --overwrite
+```
+
+This writes:
+
+```text
+/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_ssta.zarr
+/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_sst_trend.zarr
+/data1/user/lz/osita_data/scs_5s25n/analysis/scs_monthly_area_mean_sst_ssta.csv
+/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_sst_summary.json
+```
+
+The default anomaly baseline is `1991-01-01` to `2020-12-31`. Area means use
+`cos(latitude)` weights and `ocean_mask == 1`.
+
+Known local data-quality note: the current local OSTIA/Copernicus source has
+three unusable months in the full South China Sea crop: `2014-07`, `2015-11`,
+and `2015-12`. The monthly products keep these months as missing values and
+exclude them from trend/correlation calculations rather than interpolating
+them.
+
+Generate first-pass monthly figures:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/31_make_monthly_sst_figures.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
+```
+
+This writes publication-oriented PNG drafts under:
+
+```text
+/data1/user/lz/osita_data/scs_5s25n/analysis/figures/
+```
+
+## Build daily marine heatwave products
+
+Generate Hobday-style daily climatology, 90th-percentile threshold, and annual
+marine heatwave metrics:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/32_build_daily_mhw_products.py \
+  --input-zarr /data1/user/lz/osita_data/scs_5s25n/ostia_scs_daily.zarr \
+  --output-dir /data1/user/lz/osita_data/scs_5s25n/analysis \
+  --lat-block-size 1 \
+  --workers 128 \
+  --overwrite
+```
+
+This writes:
+
+```text
+/data1/user/lz/osita_data/scs_5s25n/analysis/daily_climatology_threshold.zarr
+/data1/user/lz/osita_data/scs_5s25n/analysis/mhw_annual_metrics.zarr
+/data1/user/lz/osita_data/scs_5s25n/analysis/mhw_annual_area_mean.csv
+/data1/user/lz/osita_data/scs_5s25n/analysis/daily_mhw_summary.json
+```
+
+The first-pass MHW definition is: SST above the daily 90th percentile threshold
+for at least 5 consecutive valid days. Missing dates and all-NaN dates break
+events.
+
 ## Download external climate drivers
 
 Download and align the lightweight driver data used for explanatory modeling:
