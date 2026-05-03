@@ -1,5 +1,7 @@
 # Statistical Modeling Paper Implementation Plan
 
+> Superseded for the paper-upgrade phase by `docs/superpowers/plans/2026-05-03-statistical-modeling-paper-upgrade.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a complete first-version competition paper source for the South China Sea SST warming and marine heatwave statistical-modeling project.
