@@ -313,3 +313,20 @@ Current generated drafts:
 paper/build/main.pdf
 paper/build/main_anonymous.pdf
 ```
+
+Build the full Word version required by the competition:
+
+```bash
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/35_build_word_paper.py
+```
+
+This writes:
+
+```text
+paper/build/作品全文-组别-作品编号.docx
+paper/build/full_paper.docx
+```
+
+The Word table of contents is inserted as an updatable Word field. Open the
+document in Word/WPS and update fields before final submission so page numbers
+are refreshed.
