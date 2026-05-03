@@ -26,9 +26,11 @@
 - [x] Anonymous PDF build completed from the same `paper/main.tex`
 - [x] Word build completed with `scripts/35_build_word_paper.py`
 - [x] Anonymous PDF text scan found no school, team-member, teacher, acknowledgement, work-number, or `TJJM2026` leakage
-- [x] Word structure check found 226 paragraphs, 10 editable tables, and 16 embedded images
-- [x] Body density check found 11504 cleaned body characters
+- [x] Word structure check found 222 paragraphs, 10 editable tables, and 16 embedded images
+- [x] Body density check found 11275 cleaned body characters
 - [x] LaTeX log scan found no overfull boxes, undefined references, or undefined citation warnings
+- [x] Body hierarchy follows the official Chinese numbering style: `一、` and `（一）`
+- [x] Writing structure has been aligned with the 2023 excellent-paper style while retaining the official 2026 submission parts
 
 ## Required Upload Materials Still To Prepare Outside This Repo
 

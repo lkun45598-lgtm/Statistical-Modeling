@@ -233,6 +233,16 @@ def _add_heading(doc: Document, level: int, title: str) -> None:
     _set_paragraph_format(heading, first_line=False)
 
 
+def _chinese_number(num: int) -> str:
+    numerals = "零一二三四五六七八九十"
+    if 1 <= num <= 10:
+        return numerals[num]
+    if 11 <= num <= 19:
+        return "十" + numerals[num - 10]
+    tens, ones = divmod(num, 10)
+    return numerals[tens] + "十" + (numerals[ones] if ones else "")
+
+
 def _collect_lists(tex: str) -> tuple[list[TableSpec], list[FigureSpec]]:
     tables: list[TableSpec] = []
     figures: list[FigureSpec] = []
@@ -337,6 +347,8 @@ def _add_body_from_latex(doc: Document, tex: str) -> None:
 
     table_no = 0
     figure_no = 0
+    section_no = 0
+    subsection_no = 0
     pos = 0
     token_re = re.compile(
         r"\\section\{([^{}]+)\}|\\subsection\{([^{}]+)\}|\\section\*\{([^{}]+)\}|"
@@ -359,9 +371,12 @@ def _add_body_from_latex(doc: Document, tex: str) -> None:
         flush_text(body_without_refs[pos : match.start()])
         block = match.group(0)
         if match.group(1):
-            _add_heading(doc, 1, _clean_latex(match.group(1)))
+            section_no += 1
+            subsection_no = 0
+            _add_heading(doc, 1, f"{_chinese_number(section_no)}、{_clean_latex(match.group(1))}")
         elif match.group(2):
-            _add_heading(doc, 2, _clean_latex(match.group(2)))
+            subsection_no += 1
+            _add_heading(doc, 2, f"（{_chinese_number(subsection_no)}）{_clean_latex(match.group(2))}")
         elif match.group(3):
             _add_heading(doc, 1, _clean_latex(match.group(3)))
         elif block.startswith(r"\begin{table}"):
