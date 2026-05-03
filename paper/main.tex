@@ -1,0 +1,336 @@
+\documentclass[UTF8,a4paper,zihao=-4,fontset=fandol]{ctexart}
+
+\usepackage{geometry}
+\geometry{top=2.54cm,bottom=2.54cm,left=3.17cm,right=3.17cm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath,amssymb}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{indentfirst}
+
+\graphicspath{{paper/figures/}{figures/}}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
+\captionsetup{font=small,labelsep=quad}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setstretch{1.45}
+
+\newif\ifanonymous
+\ifdefined\ANONYMOUS
+  \anonymoustrue
+\else
+  \anonymousfalse
+\fi
+
+\title{基于 OSTIA 高分辨率海温资料的南海海表增暖与海洋热浪风险时空统计建模}
+\author{}
+\date{}
+
+\begin{document}
+
+\ifanonymous\else
+\begin{titlepage}
+  \centering
+  \vspace*{0.5cm}
+  {\heiti\zihao{3} 作品编号：TJJM2026XXXXXXX\par}
+  \vspace{2.2cm}
+  {\songti\zihao{1} 2026年（第十二届）全国大学生统计建模大赛\par}
+  \vspace{0.7cm}
+  {\songti\zihao{1} 参\ 赛\ 作\ 品\par}
+  \vspace{2.3cm}
+  {\fangsong\zihao{2} 参赛学校：华南农业大学\par}
+  \vspace{0.8cm}
+  {\fangsong\zihao{2} 论文题目：\par}
+  \vspace{0.3cm}
+  {\songti\zihao{3} 基于 OSTIA 高分辨率海温资料的南海海表增暖与海洋热浪风险时空统计建模\par}
+  \vspace{0.8cm}
+  {\fangsong\zihao{2} 参赛队员：待填写\par}
+  \vspace{0.8cm}
+  {\fangsong\zihao{2} 指导老师：（暂时不填）\par}
+  \vfill
+\end{titlepage}
+\fi
+
+\begin{center}
+{\songti\zihao{3} 基于 OSTIA 高分辨率海温资料的南海海表增暖与海洋热浪风险时空统计建模}
+\end{center}
+
+\section*{摘要}
+南海位于西太平洋季风区与低纬海气相互作用活跃带，是我国近海生态系统、渔业资源和珊瑚礁分布的重要海域。随着全球变暖背景下海洋极端热事件频率和强度增加，仅描述平均海温变化已难以充分刻画海洋热风险的实际演化。本文基于 1991--2021 年 OSTIA 日尺度高分辨率海表温度资料，裁剪得到 $5^{\circ}$S--$25^{\circ}$N、$100^{\circ}$E--$125^{\circ}$E 范围内南海及邻近海域栅格数据，构建了月尺度增暖测度、日尺度海洋热浪识别、空间趋势估计和气候驱动解释相结合的统计建模框架。研究首先采用面积加权平均、月气候态距平和线性趋势模型刻画区域平均 SST/SSTA 变化；其次依据 Hobday 等提出的海洋热浪定义，以 1991--2020 年为气候态基准期，使用 11 日滑动窗口计算逐日 90\% 分位阈值，识别持续不少于 5 个有效日的海洋热浪事件；进一步从频次、总天数、持续时间、最大强度和累计强度等维度构建年度热浪风险指标；最后引入 Niño 3.4、PDO、DMI、SOI 及 NCEP/NCAR 10 m 风场资料，建立相关分析和标准化多元回归模型，解释年际波动来源。
+
+结果表明，1991--2021 年南海区域平均 SST 呈显著增暖趋势，线性趋势约为 $0.191\,^{\circ}\mathrm{C}/10a$，区域平均 SSTA 趋势约为 $0.174\,^{\circ}\mathrm{C}/10a$。同期海洋热浪风险增强更为直观：区域平均热浪频次约增加 $1.308$ 次/10年，总天数约增加 $13.381$ 天/10年，累计强度约增加 $15.176\,^{\circ}\mathrm{C}\cdot\mathrm{d}/10a$。空间上，增暖和热浪增加并非均匀分布，南海北部陆架、近岸海域及部分中南部海盆表现出较明显的正趋势。驱动因子分析显示，风速距平与月尺度 SSTA 及年度热浪总天数均呈显著负相关；标准化回归中，风速距平对月尺度 SSTA 的系数为 $-0.363$，对年度热浪总天数的系数为 $-0.558$，说明弱风背景下的海气热交换减弱可能是热风险累积的重要统计信号。本文的创新在于将高分辨率日尺度海温资料、海洋热浪事件识别和解释型统计建模统一于同一南海网格框架，为南海海洋热风险监测、生态保护和区域适应性管理提供了可复现的量化依据。
+
+\noindent\textbf{关键词：} 南海；海表温度；海洋热浪；OSTIA；统计建模
+
+\newpage
+\tableofcontents
+\newpage
+\listoftables
+\listoffigures
+\newpage
+
+\section{引言}
+
+\subsection{研究背景}
+海表温度（Sea Surface Temperature, SST）是描述海洋热状态和海气相互作用的基础变量，也是热带气旋、季风降水、海洋生态系统生产力和珊瑚礁热胁迫评估中的关键因子。南海地处西太平洋暖池西缘，受东亚季风、黑潮入侵、陆架环流和低纬遥相关共同影响，其热环境变化具有显著区域性和季节性。近年来，平均海温升高与极端海洋热事件增加共同改变了南海热风险格局，对珊瑚礁、近海养殖、渔业资源和海洋保护区管理均具有现实影响。
+
+与陆地高温事件类似，海洋热浪（Marine Heatwave, MHW）强调海温在相对气候态背景下持续异常偏高的过程。Hobday 等\cite{hobday2016mhw}将其定义为 SST 超过逐日气候态高分位阈值且持续一定时间的事件，为不同海域、不同时间尺度的极端热事件比较提供了统一框架。对于南海而言，若只分析月平均 SST 或区域平均趋势，容易低估短时持续高温对生态系统的影响；若只识别热浪事件而不分析长期增暖背景，又难以解释热浪风险增强的气候基础。因此，有必要在同一数据框架下同时开展平均态增暖和极端热事件建模。
+
+\subsection{研究现状与问题提出}
+现有关于海洋增暖和海洋热浪的研究通常沿两条路径展开：一类侧重气候尺度趋势，利用再分析、卫星融合或模式资料评估海温增暖的空间差异；另一类侧重极端事件识别，从频次、持续时间和强度等指标刻画海洋热浪变化。对于统计建模竞赛论文而言，仅展示模型精度或单一趋势值不足以形成完整论证。优秀统计建模论文通常需要回答三个递进问题：研究对象是否存在显著变化、变化可由哪些指标量化、模型结果能否解释现实问题。
+
+基于此，本文将研究问题概括为：第一，1991--2021 年南海海表温度是否存在显著增暖，其空间分布是否一致；第二，平均态增暖是否对应海洋热浪风险的显著增强；第三，气候指数和局地风场能否对 SST 距平及海洋热浪年际变化提供统计解释。本文不将研究主线设定为未来预测，而是强调统计测度、事件识别和解释建模，以保证结论直接来源于已观测资料。
+
+\subsection{研究思路与主要贡献}
+本文研究路线如图表体系所示：首先完成 OSTIA 日尺度资料的南海区域裁剪和质量检查；其次构造月尺度气候态、SSTA、区域平均序列和趋势场；再次在日尺度上建立海洋热浪识别模型并聚合为年度风险指标；最后利用气候指数和风场资料建立驱动因子解释模型。主要贡献包括：
+
+第一，构建了适用于南海的 1991--2021 年日尺度 SST 统计分析数据集，统一了月尺度增暖分析和日尺度极端事件识别的空间网格。第二，将海洋热浪定义转化为可复现的逐格点统计模型，避免仅用区域平均月温代表极端热风险。第三，在结果解释中引入风场和大尺度气候指数，区分长期增暖趋势与年际波动解释，提高了论文的统计建模完整性。
+
+\section{研究区、数据来源与质量控制}
+
+\subsection{研究区范围}
+本文研究区设定为 $5^{\circ}$S--$25^{\circ}$N、$100^{\circ}$E--$125^{\circ}$E，覆盖南海主体海域及其低纬邻近区域。该范围兼顾南海北部陆架、南海中部海盆、南海南部岛礁及赤道侧海气相互作用背景，能够较完整反映南海热环境的空间梯度。所有空间统计均保留原始规则经纬度网格，并在区域平均时使用 $\cos(\varphi)$ 作为纬向面积权重。
+
+\subsection{数据来源}
+核心 SST 数据来自 OSTIA（Operational Sea Surface Temperature and Sea Ice Analysis）高分辨率海温分析资料。OSTIA 通过多源卫星观测、现场观测和最优插值方法提供全球无缝 L4 SST 产品\cite{donlon2012ostia,copernicus2026ostia}。本文使用本地整理后的 1991--2021 年日尺度 SST 数据，并进一步聚合得到月尺度 SST 数据。外部解释变量包括 NOAA/PSL 提供的 Niño 3.4、PDO、DMI 和 SOI 月度指数，以及 NCEP/NCAR Reanalysis 1 的 10 m 纬向和经向风场\cite{kalnay1996ncep,noaapsl2026indices}。
+
+\begin{table}[H]
+\centering
+\caption{研究数据基本信息}
+\resizebox{\textwidth}{!}{\input{paper/tables/data_summary_table.tex}}
+\end{table}
+
+\subsection{数据质量控制}
+在资料检查中发现，本地 OSTIA/Copernicus 源文件并非完全连续：2014 年 7 月和 2015 年 12 月缺失全部日历日，2015 年 11 月虽存在日记录但研究区海洋格点 SST 全部为缺失值。考虑到这些缺测集中于完整月份，且直接插值可能人为削弱或制造海洋热浪事件，本文采取保守处理：缺失月份不参与月尺度趋势、相关和回归计算；日尺度海洋热浪识别中，缺失日和全无效日不计入有效日数，并打断连续事件。该策略保证了趋势和事件统计不将无观测信息误判为无风险。
+
+\section{指标体系与统计建模方法}
+
+\subsection{面积加权平均与月尺度距平}
+设 $T_{tij}$ 表示时间 $t$、纬度 $i$、经度 $j$ 的 SST，$M_{ij}$ 表示海洋掩膜，纬度为 $\varphi_i$。区域面积加权平均定义为
+\begin{equation}
+\bar{T}_{t}=\frac{\sum_{i,j}T_{tij}M_{ij}\cos\varphi_i}{\sum_{i,j}M_{ij}\cos\varphi_i}.
+\end{equation}
+月尺度气候态以 1991--2020 年为基准期，对每个自然月分别计算多年平均。SSTA 定义为对应月份 SST 与该月气候态之差，用于消除季节循环影响。
+
+\subsection{趋势估计与显著性检验}
+对区域平均序列和每个空间格点分别建立线性趋势模型
+\begin{equation}
+y_t=\alpha+\beta x_t+\varepsilon_t,
+\end{equation}
+其中 $x_t$ 为距起始时刻的年份数，$\beta$ 表示单位年份变化率。为便于解释，本文将趋势换算为每 10 年变化量。区域平均趋势使用普通最小二乘估计并报告 $p$ 值；空间趋势图采用同一线性斜率估计，仅对有效观测数达到阈值的格点计算。Mann-Kendall 和 Theil-Sen 方法\cite{mann1945trend,sen1968slope}可作为后续稳健性扩展，本文第一版以线性趋势为主，便于与回归解释模型保持一致。
+
+\subsection{海洋热浪事件识别}
+本文采用 Hobday 等\cite{hobday2016mhw}提出的事件定义。对每个海洋格点，以 1991--2020 年为基准期，保留 366 日历日并对每个日序使用前后共 11 日滑动窗口，计算逐日气候态均值 $C_d$ 和 90\% 分位阈值 $Q_{0.9,d}$。当某日 SST 满足
+\begin{equation}
+T_t>Q_{0.9,d(t)}
+\end{equation}
+且该状态连续不少于 5 个有效日时，定义为一次海洋热浪事件。事件强度使用 $T_t-C_{d(t)}$ 表示。年度指标包括事件频次、总天数、平均持续时间、最长持续时间、最大强度和累计强度。
+
+\subsection{驱动因子解释模型}
+为解释年际和月际波动，本文建立相关分析和标准化多元回归模型。月尺度目标变量为区域平均 SSTA，候选解释变量包括 Niño 3.4、PDO、DMI、SOI 以及区域平均风速距平，并考察 0--6 月滞后相关。年度海洋热浪解释模型以 MHW 总天数为目标变量，解释变量采用年度平均的 Niño 3.4、PDO、DMI 和风速距平。为消除量纲影响，回归前对目标变量和解释变量均进行标准化：
+\begin{equation}
+z=\frac{x-\mu_x}{\sigma_x}.
+\end{equation}
+模型系数因此可解释为标准差单位下的边际影响。多重共线性通过方差膨胀因子（VIF）检查。
+
+\section{南海海表温度增暖的统计测度}
+
+\subsection{区域平均 SST 与 SSTA 变化}
+图 1 展示了 1991--2021 年南海区域平均月尺度 SST 和 SSTA 序列。SST 呈明显季节循环，暖季和冷季差异显著；去除月气候态后，SSTA 序列仍表现出持续上升趋势。表 2 给出了区域平均趋势估计结果：SST 线性趋势为 $0.191\,^{\circ}\mathrm{C}/10a$，SSTA 线性趋势为 $0.174\,^{\circ}\mathrm{C}/10a$。SSTA 趋势的 $p$ 值远小于 0.001，说明在消除季节循环后，南海区域平均海表温度仍存在显著长期增暖。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{sst_area_mean_timeseries.png}
+\caption{南海区域平均月尺度 SST 与 SSTA 时间序列}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{区域平均增暖和海洋热浪风险趋势摘要}
+\resizebox{\textwidth}{!}{\input{paper/tables/trend_summary_table.tex}}
+\end{table}
+
+\subsection{季节循环与平均态空间格局}
+图 2 显示南海区域平均 SST 的月气候态循环。研究区 SST 在春季快速升高，夏季维持高值，冬季受东北季风和海气热通量影响明显降低。该季节循环说明，在识别异常增暖和热浪事件时必须使用逐月或逐日气候态，而不能直接用全年统一阈值。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{sst_climatology_cycle.png}
+\caption{南海区域平均月尺度 SST 气候态季节循环}
+\end{figure}
+
+图 3 给出了 1991--2021 年平均 SST 空间分布。整体上，低纬和南部海域平均 SST 较高，北部陆架及靠近大陆一侧相对较低，体现了纬向辐射差异和季风环流共同作用下的平均态格局。图 4 的 SSTA 趋势场进一步表明，增暖并非空间均匀过程，部分近岸和陆架海域趋势更强，提示区域性热风险管理需要关注空间差异。
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{sst_mean_map.png}
+\caption{多年平均 SST}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{ssta_trend_map.png}
+\caption{SSTA 线性趋势}
+\end{subfigure}
+\caption{南海 SST 平均态和月尺度 SSTA 趋势空间分布}
+\end{figure}
+
+\section{海洋热浪风险的时空演化}
+
+\subsection{区域平均海洋热浪指标变化}
+图 5 展示了年度区域平均海洋热浪指标。与平均海温趋势相比，海洋热浪指标对极端热风险的刻画更直接。1991--2021 年，MHW 频次、总天数、最大持续时间和累计强度均呈上升趋势。区域平均热浪频次增加 $1.308$ 次/10年，总天数增加 $13.381$ 天/10年，累计强度增加 $15.176\,^{\circ}\mathrm{C}\cdot\mathrm{d}/10a$。这些结果说明，南海增暖并不仅表现为平均态抬升，同时已经转化为持续性高温事件的风险增加。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{mhw_area_mean_timeseries.png}
+\caption{南海区域平均年度海洋热浪指标时间序列}
+\end{figure}
+
+\subsection{热浪总天数与强度空间格局}
+图 6 显示多年平均年度 MHW 总天数及其趋势。多年平均总天数较高的区域并不完全等同于 SST 平均值最高区域，说明热浪风险受当地气候态阈值、年际变率和持续性共同影响。趋势图显示，大部分海洋格点 MHW 总天数呈正趋势，局地差异明显。对于生态系统而言，热浪总天数比单日最大温度更接近累积热胁迫概念，因此该指标可作为后续珊瑚礁风险讨论的核心统计量。
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{mhw_mean_total_days_map.png}
+\caption{多年平均 MHW 总天数}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{mhw_total_days_trend_map.png}
+\caption{MHW 总天数趋势}
+\end{subfigure}
+\caption{南海年度海洋热浪总天数空间格局及趋势}
+\end{figure}
+
+图 7 展示 MHW 累计强度趋势。累计强度综合了持续时间和强度信息，能够反映高温事件对海洋生态系统的累积压力。结果显示，累计强度在多个海区呈上升趋势，与总天数趋势基本一致，说明热浪风险增强并非仅由少数极端高温日驱动，而是包含持续性增强。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.76\textwidth]{mhw_cumulative_intensity_trend_map.png}
+\caption{南海年度 MHW 累计强度趋势空间分布}
+\end{figure}
+
+\section{气候驱动因子解释模型}
+
+\subsection{滞后相关分析}
+表 3 汇总了月尺度 SSTA 与主要驱动因子的最强滞后相关。风速距平与 SSTA 的同期相关最强，相关系数为 $-0.380$，且显著性水平很高。这表明在区域平均意义上，风速偏弱时海表异常增暖更容易维持。DMI 和 Niño 3.4 在 6 个月滞后下也表现出正相关，说明印度洋偶极子和 ENSO 信号可能通过遥相关或背景环流影响南海热状态，但相关强度低于风速距平。
+
+\begin{table}[H]
+\centering
+\caption{月尺度 SSTA 与驱动因子的最强滞后相关}
+\resizebox{\textwidth}{!}{\input{paper/tables/monthly_driver_best_lag_table.tex}}
+\end{table}
+
+\subsection{标准化多元回归结果}
+月尺度解释模型的调整 $R^2$ 为 0.215，说明所选驱动因子能够解释约五分之一的月尺度 SSTA 标准化波动。表 4 显示，Niño 3.4（滞后 3 月）和风速距平均通过显著性检验，其中风速距平系数为 $-0.363$，是最稳定的负向解释变量；PDO 系数为 $-0.273$，表现为同期负相关；DMI 在多元模型中不显著，说明其单变量滞后相关可能与其他变量共享部分信息。
+
+\begin{table}[H]
+\centering
+\caption{月尺度 SSTA 标准化解释模型}
+\resizebox{\textwidth}{!}{\input{paper/tables/monthly_driver_regression_table.tex}}
+\end{table}
+
+年度 MHW 总天数解释模型的调整 $R^2$ 为 0.206。表 5 显示，风速距平仍是显著解释变量，标准化系数为 $-0.558$，$p=0.003$；其他大尺度气候指数在该年度样本下未达到显著水平。这一结果提示，南海海洋热浪总天数的年际变化与局地风场异常关系更稳定，而 ENSO、IOD 等大尺度信号可能更多通过季节性、区域性或非线性途径发挥作用。
+
+\begin{table}[H]
+\centering
+\caption{年度 MHW 总天数标准化解释模型}
+\resizebox{\textwidth}{!}{\input{paper/tables/annual_driver_regression_table.tex}}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{驱动因子解释模型拟合优度}
+\resizebox{0.72\textwidth}{!}{\input{paper/tables/driver_model_summary_table.tex}}
+\end{table}
+
+\subsection{模型解释图}
+图 8 给出了驱动因子与 SSTA/MHW 指标的相关热图，图 9 则展示月尺度 SSTA 和年度 MHW 总天数的标准化拟合效果。模型并未追求完全预测所有波动，而是用于识别具有稳定统计意义的解释变量。总体而言，风速距平是贯穿平均态异常和极端热风险的核心解释因子；其物理含义可能包括风速偏弱时潜热和感热释放减弱、上混合作用减弱，以及近表层暖水更容易维持。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{driver_correlation_heatmap.png}
+\caption{南海 SSTA 与 MHW 指标的驱动因子相关热图}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{monthly_ssta_driver_fit.png}
+\caption{月尺度 SSTA 回归拟合}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{annual_mhw_driver_fit.png}
+\caption{年度 MHW 总天数回归拟合}
+\end{subfigure}
+\caption{驱动因子标准化回归模型拟合结果}
+\end{figure}
+
+\section{讨论、结论与建议}
+
+\subsection{讨论}
+本文结果表明，南海海表热环境变化具有“平均态增暖”和“极端热风险增强”两重特征。区域平均 SSTA 的显著上升提供了长期背景，而 MHW 频次、总天数和累计强度的同步增加则说明热风险正在以更贴近生态胁迫的形式表现出来。对于珊瑚礁等热敏感生态系统而言，持续多日的高温事件比单纯年均或月均海温更具解释力，因此 MHW 总天数和累计强度应成为后续生态风险评估的重要指标。
+
+驱动因子结果需要审慎解释。本文使用的是区域平均风场和气候指数，模型能够揭示统计联系，但不能单独证明因果机制。风速距平显著为负，符合弱风条件下海表暖异常更容易累积的物理直觉；ENSO 和 IOD 信号在月尺度相关中存在滞后影响，但在年度 MHW 回归中不显著，说明其影响可能受季节、空间位置和事件类型调制。后续可进一步引入净热通量、混合层深度、海流和台风扰动等变量，提高机制解释能力。
+
+本文也存在限制。第一，本地数据存在 2014 年 7 月、2015 年 11 月和 2015 年 12 月三个不可用月份，虽然本文采用缺失处理避免人为插值，但对个别年度 MHW 指标仍可能有影响。第二，当前空间趋势检验以线性趋势为主，尚未系统加入非参数趋势稳健性检验。第三，海洋热浪阈值采用 1991--2020 年基准期，若改用不同基准期，事件频次和强度绝对值可能变化，但长期增强结论预计仍具有稳健性。
+
+\subsection{主要结论}
+综合上述分析，本文得到以下结论：
+
+第一，1991--2021 年南海区域平均 SST 和 SSTA 均呈显著上升趋势。区域平均 SST 增暖速率约为 $0.191\,^{\circ}\mathrm{C}/10a$，SSTA 增暖速率约为 $0.174\,^{\circ}\mathrm{C}/10a$，说明南海海表热环境在过去 31 年持续变暖。
+
+第二，南海海洋热浪风险显著增强。区域平均 MHW 频次、总天数和累计强度均呈上升趋势，其中总天数增加约 $13.381$ 天/10年，累计强度增加约 $15.176\,^{\circ}\mathrm{C}\cdot\mathrm{d}/10a$。该结果表明，平均态增暖已经转化为更高频、更持久的极端海洋热事件。
+
+第三，热浪风险具有明显空间差异。多年平均 MHW 总天数和趋势在不同海区差异较大，近岸、陆架及部分中南部海域表现出较强风险信号，说明南海热风险管理不宜仅依赖单一区域平均指标。
+
+第四，风速距平是本文模型中最稳定的解释变量。月尺度 SSTA 与同期风速距平相关系数为 $-0.380$，年度 MHW 总天数与年度风速距平相关系数为 $-0.506$；在多元回归中，风速距平对月尺度 SSTA 和年度 MHW 总天数均保持显著负向影响。
+
+\subsection{建议}
+基于统计建模结果，本文提出三点建议。第一，在南海海洋热风险监测中，应同时发布平均 SST 距平和 MHW 事件指标，特别关注总天数和累计强度这类累积风险量。第二，对于珊瑚礁、海洋牧场和近岸养殖区，应结合本文识别的高趋势区域布设重点监测断面，建立“持续高温天数+风速异常”的早期预警指标。第三，后续研究可将本文统计框架与生态调查资料、珊瑚白化记录或渔业资源变化相结合，形成从物理热风险到生态影响的综合评估模型。
+
+\section*{参考文献}
+\addcontentsline{toc}{section}{参考文献}
+\begin{thebibliography}{99}
+\bibitem{donlon2012ostia} Donlon C J, Martin M, Stark J, Roberts-Jones J, Fiedler E, Wimmer W. The Operational Sea Surface Temperature and Sea Ice Analysis (OSTIA) system[J]. Remote Sensing of Environment, 2012, 116: 140--158.
+\bibitem{copernicus2026ostia} Copernicus Marine Service. Global Ocean OSTIA Sea Surface Temperature and Sea Ice Reprocessed[EB/OL]. Product SST\_GLO\_SST\_L4\_REP\_OBSERVATIONS\_010\_011, DOI: 10.48670/moi-00168.
+\bibitem{hobday2016mhw} Hobday A J, Alexander L V, Perkins S E, et al. A hierarchical approach to defining marine heatwaves[J]. Progress in Oceanography, 2016, 141: 227--238.
+\bibitem{kalnay1996ncep} Kalnay E, Kanamitsu M, Kistler R, et al. The NCEP/NCAR 40-Year Reanalysis Project[J]. Bulletin of the American Meteorological Society, 1996, 77(3): 437--471.
+\bibitem{noaapsl2026indices} NOAA Physical Sciences Laboratory. Climate indices monthly time series[EB/OL]. Niño 3.4, PDO, DMI and SOI monthly indices.
+\bibitem{mann1945trend} Mann H B. Nonparametric tests against trend[J]. Econometrica, 1945, 13(3): 245--259.
+\bibitem{sen1968slope} Sen P K. Estimates of the regression coefficient based on Kendall's tau[J]. Journal of the American Statistical Association, 1968, 63(324): 1379--1389.
+\end{thebibliography}
+
+\appendix
+\section{附录：可复现计算流程}
+本文主要计算脚本均保存在项目仓库的 \texttt{scripts/} 目录下，核心流程如下：
+\begin{itemize}
+  \item 南海 OSTIA 裁剪：\texttt{20\_prepare\_ostia\_scs.py}；
+  \item 月尺度 SSTA 和趋势产品：\texttt{30\_build\_monthly\_sst\_products.py}；
+  \item 月尺度图件：\texttt{31\_make\_monthly\_sst\_figures.py}；
+  \item 日尺度海洋热浪指标：\texttt{32\_build\_daily\_mhw\_products.py}；
+  \item MHW 图件和趋势表：\texttt{33\_make\_mhw\_figures.py}；
+  \item 驱动因子解释分析：\texttt{34\_build\_driver\_analysis.py}。
+\end{itemize}
+日尺度 MHW 计算采用 128 个纬度块并行 worker 完成，以保证全南海 600 $\times$ 500 栅格上的逐日阈值和年度事件指标可在合理时间内复现。
+
+\ifanonymous\else
+\section*{致谢}
+感谢本次竞赛组织方提供统计建模实践平台。感谢指导教师和同学在选题讨论、数据处理和论文写作过程中给予的帮助。本文使用的 OSTIA、NOAA/PSL 气候指数和 NCEP/NCAR 再分析资料均为公开数据，谨向相关数据生产和维护团队表示感谢。
+\fi
+
+\end{document}

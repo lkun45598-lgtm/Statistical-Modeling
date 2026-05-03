@@ -283,3 +283,33 @@ Recommended:
 - SwinLSTM baseline
 - ReefCastNet-SimVP (main)
 - CAS-Canglong as coarse S2S external reference only
+
+## Build the competition paper draft
+
+The current statistical-modeling paper source is under `paper/`. Build the full
+version PDF, including cover page and acknowledgement:
+
+```bash
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  -outdir=paper/build paper/main.tex
+```
+
+Build the anonymous PDF version, excluding the cover page and acknowledgement:
+
+```bash
+xelatex -interaction=nonstopmode -halt-on-error \
+  -output-directory=paper/build \
+  -jobname=main_anonymous \
+  '\def\ANONYMOUS{1}\input{paper/main.tex}'
+xelatex -interaction=nonstopmode -halt-on-error \
+  -output-directory=paper/build \
+  -jobname=main_anonymous \
+  '\def\ANONYMOUS{1}\input{paper/main.tex}'
+```
+
+Current generated drafts:
+
+```text
+paper/build/main.pdf
+paper/build/main_anonymous.pdf
+```

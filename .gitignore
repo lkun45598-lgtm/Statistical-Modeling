@@ -39,3 +39,6 @@ AGENTS.md
 *.tmp
 *.part
 .DS_Store
+
+# LaTeX/PDF build outputs
+paper/build/
