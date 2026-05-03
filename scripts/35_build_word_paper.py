@@ -17,7 +17,7 @@ from docx.shared import Cm, Inches, Pt
 
 DEFAULT_TEX = Path("paper/main.tex")
 DEFAULT_OUT = Path("paper/build/作品全文-组别-作品编号.docx")
-TITLE = "基于 OSTIA 高分辨率海温资料的南海海表增暖与海洋热浪风险时空统计建模"
+TITLE = "基于高分辨率海温资料的南海增暖及海洋热浪风险统计建模研究"
 
 
 @dataclass
@@ -107,11 +107,14 @@ def _clean_latex(text: str) -> str:
         r"\beta": "β",
         r"\varepsilon": "ε",
         r"\varphi": "φ",
+        r"\leq": "≤",
+        r"\geq": "≥",
         r"\bar": "",
         r"\sum": "Σ",
         r"\frac": "",
         r"\textwidth": "",
         r"\noindent": "",
+        r"\_": "_",
     }
     out = text
     out = re.sub(r"\\cite\{[^}]+\}", "", out)
@@ -119,6 +122,7 @@ def _clean_latex(text: str) -> str:
     out = re.sub(r"\\texttt\{([^{}]+)\}", r"\1", out)
     out = re.sub(r"\\textbf\{([^{}]+)\}", r"\1", out)
     out = re.sub(r"\^\{\\circ\}", "°", out)
+    out = out.replace(r"^\circ", "°")
     out = re.sub(r"\^\{([^{}]+)\}", r"^\1", out)
     out = re.sub(r"_\{([^{}]+)\}", r"_\1", out)
     out = out.replace("$", "")
@@ -267,7 +271,6 @@ def _add_front_matter(doc: Document, tex: str, tables: list[TableSpec], figures:
     _add_heading(doc, 1, "目录")
     p = doc.add_paragraph()
     _add_toc_field(p, r'TOC \o "1-3" \h \z \u')
-    _add_body_paragraph(doc, "说明：若目录页码未自动显示，请在 Word 中选中目录后右键选择“更新域”。")
     doc.add_page_break()
 
     _add_heading(doc, 1, "表格与插图清单")
@@ -382,11 +385,17 @@ def _add_appendix_and_ack(doc: Document) -> None:
     _add_body_paragraph(doc, "本文主要计算脚本均保存在项目仓库的 scripts/ 目录下，核心流程如下：")
     for item in [
         "南海 OSTIA 裁剪：20_prepare_ostia_scs.py；",
+        "外部气候指数和风场下载：21_download_external_drivers.py；",
         "月尺度 SSTA 和趋势产品：30_build_monthly_sst_products.py；",
         "月尺度图件：31_make_monthly_sst_figures.py；",
         "日尺度海洋热浪指标：32_build_daily_mhw_products.py；",
         "MHW 图件和趋势表：33_make_mhw_figures.py；",
-        "驱动因子解释分析：34_build_driver_analysis.py。",
+        "驱动因子解释分析：34_build_driver_analysis.py；",
+        "Word 论文生成：35_build_word_paper.py；",
+        "分区统计：36_build_subregion_analysis.py；",
+        "稳健性和阈值敏感性：37_build_robustness_analysis.py；",
+        "综合海洋热风险指数：38_build_heat_risk_index.py；",
+        "最终论文图表资产清单：39_make_paper_tables_figures.py。",
     ]:
         p = doc.add_paragraph()
         _set_paragraph_format(p, first_line=False)
@@ -394,7 +403,7 @@ def _add_appendix_and_ack(doc: Document) -> None:
         _set_run_font(run)
     _add_body_paragraph(
         doc,
-        "日尺度 MHW 计算采用 128 个纬度块并行 worker 完成，以保证全南海 600 × 500 栅格上的逐日阈值和年度事件指标可在合理时间内复现。",
+        "主要本地数据包括原始/裁剪后日尺度数据 ostia_scs_daily.zarr、月尺度数据 ostia_scs_monthly.zarr，以及 scs_5s25n/analysis/ 下的统计分析输出。日尺度 MHW 计算采用纬度块并行方式完成，主模型阈值为 90% 分位，稳健性检验中额外计算 85% 和 95% 分位阈值。所有缺失月份保持缺失状态，不进行插值。",
     )
     _add_heading(doc, 1, "致谢")
     _add_body_paragraph(
