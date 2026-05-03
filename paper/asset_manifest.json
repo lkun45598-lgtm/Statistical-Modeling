@@ -1,0 +1,194 @@
+{
+  "paper_dir": "paper",
+  "workflow_diagram": {
+    "path": "paper/figures/workflow_diagram.png",
+    "bytes": 170181
+  },
+  "figures": [
+    {
+      "id": "fig:workflow",
+      "path": "paper/figures/workflow_diagram.png",
+      "caption": "研究技术路线",
+      "exists": true,
+      "bytes": 170181
+    },
+    {
+      "id": "fig:sst_series",
+      "path": "paper/figures/sst_area_mean_timeseries.png",
+      "caption": "南海区域平均月尺度 SST 与 SSTA 时间序列",
+      "exists": true,
+      "bytes": 630785
+    },
+    {
+      "id": "fig:sst_climatology",
+      "path": "paper/figures/sst_climatology_cycle.png",
+      "caption": "南海区域平均月尺度 SST 气候态季节循环",
+      "exists": true,
+      "bytes": 141332
+    },
+    {
+      "id": "fig:sst_maps",
+      "path": "paper/figures/sst_mean_map.png",
+      "caption": "南海多年平均 SST 空间分布",
+      "exists": true,
+      "bytes": 286153
+    },
+    {
+      "id": "fig:ssta_trend",
+      "path": "paper/figures/ssta_trend_map.png",
+      "caption": "南海月尺度 SSTA 趋势空间分布",
+      "exists": true,
+      "bytes": 412352
+    },
+    {
+      "id": "fig:subregion",
+      "path": "paper/figures/subregion_trend_panel.png",
+      "caption": "南海分区增暖与海洋热浪变化",
+      "exists": true,
+      "bytes": 790144
+    },
+    {
+      "id": "fig:robust",
+      "path": "paper/figures/robust_trend_comparison.png",
+      "caption": "主要指标趋势稳健性比较",
+      "exists": true,
+      "bytes": 170963
+    },
+    {
+      "id": "fig:mhw_series",
+      "path": "paper/figures/mhw_area_mean_timeseries.png",
+      "caption": "南海区域平均年度海洋热浪指标时间序列",
+      "exists": true,
+      "bytes": 606141
+    },
+    {
+      "id": "fig:mhw_maps",
+      "path": "paper/figures/mhw_mean_total_days_map.png",
+      "caption": "多年平均年度 MHW 总天数空间分布",
+      "exists": true,
+      "bytes": 615570
+    },
+    {
+      "id": "fig:mhw_total_days_trend",
+      "path": "paper/figures/mhw_total_days_trend_map.png",
+      "caption": "年度 MHW 总天数趋势空间分布",
+      "exists": true,
+      "bytes": 660160
+    },
+    {
+      "id": "fig:mhw_cumulative_trend",
+      "path": "paper/figures/mhw_cumulative_intensity_trend_map.png",
+      "caption": "年度 MHW 累计强度趋势空间分布",
+      "exists": true,
+      "bytes": 599494
+    },
+    {
+      "id": "fig:threshold_sensitivity",
+      "path": "paper/figures/mhw_threshold_sensitivity.png",
+      "caption": "MHW 阈值敏感性检验",
+      "exists": true,
+      "bytes": 237312
+    },
+    {
+      "id": "fig:hri",
+      "path": "paper/figures/heat_risk_index_map.png",
+      "caption": "南海相对综合海洋热风险指数空间分布",
+      "exists": true,
+      "bytes": 116347
+    },
+    {
+      "id": "fig:driver_heatmap",
+      "path": "paper/figures/driver_correlation_heatmap.png",
+      "caption": "南海 SSTA 与 MHW 指标的驱动因子相关热图",
+      "exists": true,
+      "bytes": 253214
+    },
+    {
+      "id": "fig:monthly_driver_fit",
+      "path": "paper/figures/monthly_ssta_driver_fit.png",
+      "caption": "月尺度 SSTA 驱动因子回归拟合",
+      "exists": true,
+      "bytes": 501054
+    },
+    {
+      "id": "fig:annual_driver_fit",
+      "path": "paper/figures/annual_mhw_driver_fit.png",
+      "caption": "年度 MHW 总天数驱动因子回归拟合",
+      "exists": true,
+      "bytes": 253732
+    }
+  ],
+  "tables": [
+    {
+      "id": "tab:data",
+      "path": "paper/tables/data_summary_table.tex",
+      "caption": "数据来源与变量说明",
+      "exists": true,
+      "bytes": 455
+    },
+    {
+      "id": "tab:trend",
+      "path": "paper/tables/trend_summary_table.tex",
+      "caption": "区域平均增暖和海洋热浪风险趋势摘要",
+      "exists": true,
+      "bytes": 366
+    },
+    {
+      "id": "tab:subregion",
+      "path": "paper/tables/subregion_summary_table.tex",
+      "caption": "南海分区增暖与海洋热浪趋势摘要",
+      "exists": true,
+      "bytes": 587
+    },
+    {
+      "id": "tab:robust",
+      "path": "paper/tables/robust_trend_table.tex",
+      "caption": "主要指标趋势稳健性检验",
+      "exists": true,
+      "bytes": 577
+    },
+    {
+      "id": "tab:threshold",
+      "path": "paper/tables/threshold_sensitivity_table.tex",
+      "caption": "MHW 阈值敏感性检验",
+      "exists": true,
+      "bytes": 389
+    },
+    {
+      "id": "tab:hri",
+      "path": "paper/tables/heat_risk_index_table.tex",
+      "caption": "南海分区相对综合海洋热风险指数",
+      "exists": true,
+      "bytes": 482
+    },
+    {
+      "id": "tab:driver_lag",
+      "path": "paper/tables/monthly_driver_best_lag_table.tex",
+      "caption": "月尺度 SSTA 与驱动因子的最强滞后相关",
+      "exists": true,
+      "bytes": 366
+    },
+    {
+      "id": "tab:monthly_driver",
+      "path": "paper/tables/monthly_driver_regression_table.tex",
+      "caption": "月尺度 SSTA 标准化解释模型",
+      "exists": true,
+      "bytes": 396
+    },
+    {
+      "id": "tab:annual_driver",
+      "path": "paper/tables/annual_driver_regression_table.tex",
+      "caption": "年度 MHW 总天数标准化解释模型",
+      "exists": true,
+      "bytes": 325
+    },
+    {
+      "id": "tab:driver_summary",
+      "path": "paper/tables/driver_model_summary_table.tex",
+      "caption": "驱动因子解释模型拟合优度",
+      "exists": true,
+      "bytes": 206
+    }
+  ],
+  "missing": []
+}
