@@ -287,14 +287,14 @@ Recommended:
 ## Build the competition paper draft
 
 The current statistical-modeling paper source is under `paper/`. Build the full
-version PDF, including cover page and acknowledgement:
+version PDF, including the cover page:
 
 ```bash
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   -outdir=paper/build paper/main.tex
 ```
 
-Build the anonymous PDF version, excluding the cover page and acknowledgement:
+Build the anonymous PDF version, excluding the cover page:
 
 ```bash
 xelatex -interaction=nonstopmode -halt-on-error \

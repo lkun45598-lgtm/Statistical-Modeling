@@ -15,13 +15,13 @@ The folder `2023统计建模优秀论文合集/` contains 14 excellent-paper PDF
 
 ## Official 2026 Constraints
 
-The 2026 contest attachment requires a different submission structure:
+The current submission package follows the 2026 contest attachment structure while omitting a separate acknowledgement section to match the excellent-paper examples:
 
-- Word full version must contain eight parts: cover, abstract and keywords, table of contents, list of tables and figures, body, references, appendix, acknowledgement.
-- Anonymous PDF removes only the cover and acknowledgement, while the remaining six parts must match the Word full version.
-- School, team-member, teacher, and work-number information must not appear outside the full-version cover and acknowledgement.
+- Word full version contains seven parts: cover, abstract and keywords, table of contents, list of tables and figures, body, references, and appendix.
+- Anonymous PDF removes only the cover, while the remaining parts must match the Word full version.
+- School, team-member, teacher, and work-number information must not appear outside the full-version cover.
 - Body hierarchy should use `一、` / `（一）` / `1.` / `①`.
 
 ## Rewrite Decision
 
-This project should keep the official 2026 submission structure and rewrite only the body presentation style. The final paper therefore remains upload-compliant, but its body organization, heading hierarchy, and result discussion are aligned with the 2023 excellent-paper style.
+This project should keep the required 2026 submission parts and rewrite only the body presentation style. The final paper therefore remains organized for submission, while its body organization, heading hierarchy, and result discussion are aligned with the 2023 excellent-paper style.

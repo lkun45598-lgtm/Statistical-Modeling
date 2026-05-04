@@ -17,7 +17,7 @@ from docx.shared import Cm, Inches, Pt
 
 DEFAULT_TEX = Path("paper/main.tex")
 DEFAULT_OUT = Path("paper/build/作品全文-组别-作品编号.docx")
-TITLE = "基于高分辨率海温资料的南海增暖及海洋热浪风险统计建模研究"
+TITLE = "基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究"
 
 
 @dataclass
@@ -152,7 +152,8 @@ def _extract_abstract(tex: str) -> tuple[list[str], str]:
 
 def _extract_body(tex: str) -> str:
     start = tex.index(r"\section{引言}")
-    end = tex.index(r"\ifanonymous\else", start)
+    end_markers = [r"\appendix", r"\ifanonymous\else", r"\end{document}"]
+    end = min(tex.index(marker, start) for marker in end_markers if marker in tex[start:])
     return tex[start:end].strip()
 
 
@@ -405,9 +406,9 @@ def _add_body_from_latex(doc: Document, tex: str) -> None:
     _add_references(doc, body)
 
 
-def _add_appendix_and_ack(doc: Document) -> None:
+def _add_appendix(doc: Document) -> None:
     _add_heading(doc, 1, "附录：可复现计算流程")
-    _add_body_paragraph(doc, "本文主要计算脚本均保存在项目仓库的 scripts/ 目录下，核心流程如下：")
+    _add_body_paragraph(doc, "主要计算脚本均保存在项目仓库的 scripts/ 目录下，核心流程如下：")
     for item in [
         "南海 OSTIA 裁剪：20_prepare_ostia_scs.py；",
         "外部气候指数和风场下载：21_download_external_drivers.py；",
@@ -430,11 +431,6 @@ def _add_appendix_and_ack(doc: Document) -> None:
         doc,
         "主要本地数据包括原始/裁剪后日尺度数据 ostia_scs_daily.zarr、月尺度数据 ostia_scs_monthly.zarr，以及 scs_5s25n/analysis/ 下的统计分析输出。日尺度 MHW 计算采用纬度块并行方式完成，主模型阈值为 90% 分位，稳健性检验中额外计算 85% 和 95% 分位阈值。所有缺失月份保持缺失状态，不进行插值。",
     )
-    _add_heading(doc, 1, "致谢")
-    _add_body_paragraph(
-        doc,
-        "感谢本次竞赛组织方提供统计建模实践平台。感谢指导教师和同学在选题讨论、数据处理和论文写作过程中给予的帮助。本文使用的 OSTIA、NOAA/PSL 气候指数和 NCEP/NCAR 再分析资料均为公开数据，谨向相关数据生产和维护团队表示感谢。",
-    )
 
 
 def build_docx(args: argparse.Namespace) -> None:
@@ -450,7 +446,7 @@ def build_docx(args: argparse.Namespace) -> None:
 
     _add_front_matter(doc, tex, tables, figures)
     _add_body_from_latex(doc, tex)
-    _add_appendix_and_ack(doc)
+    _add_appendix(doc)
 
     doc.save(output_path)
     if args.alias:
