@@ -1,51 +1,51 @@
-# Final Submission Checklist
+# 最终提交检查清单
 
-## Required Paper Parts
+## 论文组成
 
-- [x] Cover page in Word full version
-- [x] Abstract and keywords
-- [x] Table of contents
-- [x] List of tables and figures
-- [x] Main body
-- [x] References
-- [x] Appendix
-- [x] No separate thanks section
-- [x] Cover removed from anonymous PDF
+- [x] 完整版 Word 含封面页。
+- [x] 已包含摘要和关键词。
+- [x] 已包含目录。
+- [x] 已包含表目录和图目录。
+- [x] 已包含正文。
+- [x] 已包含参考文献。
+- [x] 已包含附录。
+- [x] 未设置单独感谢章节。
+- [x] 匿名 PDF 已移除封面页。
 
-## Generated Paper Files
+## 已生成文件
 
-- [x] Word full version: `paper/build/作品全文-组别-作品编号.docx`
-- [x] Full PDF review copy: `paper/build/作品全文-组别-作品编号.pdf`
-- [x] Anonymous PDF: `paper/build/匿名作品-组别-作品编号.pdf`
-- [x] LaTeX source PDF: `paper/build/main.pdf`
-- [x] LaTeX anonymous PDF: `paper/build/main_anonymous.pdf`
+- [x] 完整版 Word：`paper/build/作品全文-组别-作品编号.docx`
+- [x] 完整版 PDF：`paper/build/作品全文-组别-作品编号.pdf`
+- [x] 匿名版 PDF：`paper/build/匿名作品-组别-作品编号.pdf`
+- [x] LaTeX 完整版 PDF：`paper/build/main.pdf`
+- [x] LaTeX 匿名版 PDF：`paper/build/main_anonymous.pdf`
 
-## Automated Checks
+## 自动检查
 
-- [x] Full PDF build completed from `paper/main.tex`
-- [x] Anonymous PDF build completed from the same `paper/main.tex`
-- [x] Word build completed with `scripts/35_build_word_paper.py`
-- [x] Anonymous PDF text scan found no school, team-member, teacher, thanks-section, work-number, or `TJJM2026` leakage
-- [x] Word structure check found 230 paragraphs, 10 editable tables, and 16 embedded images
-- [x] Body density check found 15244 cleaned body characters
-- [x] LaTeX log scan found no overfull boxes, undefined references, or undefined citation warnings
-- [x] Body hierarchy follows the official Chinese numbering style: `一、` and `（一）`
-- [x] Writing structure has been aligned with the 2023 excellent-paper style while retaining the current submission parts
+- [x] 完整版 PDF 已由 `paper/main.tex` 构建。
+- [x] 匿名版 PDF 已由同一份 `paper/main.tex` 构建。
+- [x] Word 已由 `scripts/35_build_word_paper.py` 导出。
+- [x] 完整版封面参赛队员为 `Leizheng`。
+- [x] 匿名版 PDF 文本扫描未发现学校、参赛队员、指导老师、作品编号、`TJJM2026` 或 `Leizheng` 泄露。
+- [x] Word 结构检查结果为 230 段、10 张可编辑表格、16 张嵌入图片。
+- [x] 正文篇幅已复核，匿名 PDF 从正文起始至附录前抽取文本约 1.5 万字符。
+- [x] LaTeX 日志扫描未发现 overfull boxes、未定义引用或未定义文献引用警告。
+- [x] 正文章节层级符合官方中文编号格式：`一、` 和 `（一）`。
+- [x] 写作结构已参考 2023 年优秀论文风格，同时保留当前提交要求中的必要组成部分。
 
-## Required Upload Materials Still To Prepare Outside This Repo
+## 仓库外仍需准备的材料
 
-- [ ] Final official work number and group label
-- [ ] Final team-member names
-- [ ] Final teacher information, if the team decides to include it
-- [ ] Registration form scan
-- [ ] Commitment letter scan
-- [ ] AI tool use form scan
-- [ ] CNKI duplicate-check report
-- [ ] Data and code package or cloud link
+- [ ] 竞赛系统生成的正式组别和作品编号。
+- [ ] 指导老师信息；若不填写，需要在最终封面中保持为空。
+- [ ] 报名表扫描件。
+- [ ] 承诺书扫描件。
+- [ ] AI 工具使用说明表扫描件。
+- [ ] 知网查重报告。
+- [ ] 数据和代码压缩包或云盘链接。
 
-## Manual Review Before Submission
+## 提交前人工复核
 
-- [ ] Replace `组别` and `作品编号` in generated filenames after the contest system issues the official values
-- [ ] Replace title-page placeholders in the full Word version if the team wants final names shown
-- [ ] Open the Word file once and update the table-of-contents field before final upload
-- [ ] Recheck the anonymous PDF after any later metadata or title-page edits
+- [ ] 竞赛系统生成正式值后，替换生成文件名中的 `组别` 和 `作品编号`。
+- [ ] 若正式封面要求填写学校、指导老师或作品编号，先修改完整版封面，再重新导出 Word 和 PDF。
+- [ ] 最终上传前用 Word/WPS 打开 Word 文件并更新目录域，刷新页码。
+- [ ] 后续只要改动封面、元数据或作者字段，都需要重新检查匿名 PDF。

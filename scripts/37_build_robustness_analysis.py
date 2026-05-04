@@ -20,7 +20,7 @@ import xarray as xr
 
 try:
     from scipy.stats import kendalltau, linregress, theilslopes
-except Exception as exc:  # pragma: no cover - scipy is available on the target machine.
+except Exception as exc:  # pragma: no cover - 目标机器已安装 scipy。
     raise RuntimeError("scipy is required for robustness analysis.") from exc
 
 

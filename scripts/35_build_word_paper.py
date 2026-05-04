@@ -263,7 +263,7 @@ def _collect_lists(tex: str) -> tuple[list[TableSpec], list[FigureSpec]]:
 
 
 def _add_front_matter(doc: Document, tex: str, tables: list[TableSpec], figures: list[FigureSpec]) -> None:
-    # Cover page.
+    # 封面页。
     _add_centered_title(doc, "作品编号：TJJM2026XXXXXXX", 16, "黑体", True)
     for _ in range(5):
         doc.add_paragraph()
@@ -274,7 +274,7 @@ def _add_front_matter(doc: Document, tex: str, tables: list[TableSpec], figures:
     _add_centered_title(doc, "参赛学校：华南农业大学", 22, "仿宋", False)
     _add_centered_title(doc, "论文题目：", 22, "仿宋", False)
     _add_centered_title(doc, TITLE, 16, "宋体", False)
-    _add_centered_title(doc, "参赛队员：待填写", 22, "仿宋", False)
+    _add_centered_title(doc, "参赛队员：Leizheng", 22, "仿宋", False)
     _add_centered_title(doc, "指导老师：（暂时不填）", 22, "仿宋", False)
     doc.add_page_break()
 

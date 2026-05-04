@@ -16,7 +16,7 @@ from numcodecs import Blosc
 
 try:
     from scipy.stats import linregress
-except Exception:  # pragma: no cover - scipy is available on the target machine.
+except Exception:  # pragma: no cover - 目标机器已安装 scipy。
     linregress = None
 
 

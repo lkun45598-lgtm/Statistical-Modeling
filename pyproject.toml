@@ -3,11 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "reefcastnet"
+name = "scs-sst-mhw-risk"
 version = "0.1.0"
-description = "ReefCastNet: reef-aware SST anomaly forecasting and coral bleaching heat-stress evaluation"
+description = "South China Sea SST warming and marine heatwave risk assessment workflow"
 requires-python = ">=3.10"
-authors = [{name = "ReefCastNet Team"}]
-
-[tool.setuptools.packages.find]
-where = ["src"]
+authors = [{name = "Leizheng"}]

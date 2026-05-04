@@ -1,4 +1,4 @@
-# Python
+# Python 缓存
 __pycache__/
 *.py[cod]
 *.pyo
@@ -8,14 +8,14 @@ __pycache__/
 .ruff_cache/
 .ipynb_checkpoints/
 
-# Virtual environments and local settings
+# 虚拟环境和本地配置
 .venv/
 venv/
 env/
 .env
 .env.*
 
-# Generated data and model artifacts
+# 生成数据和模型产物
 data/processed/
 outputs/
 outputs_toy/
@@ -26,19 +26,20 @@ outputs_toy/
 *.npz
 *.npy
 
-# Large local competition/data products live outside this repo
+# 大型本地比赛数据和分析产物不进入仓库
 osita_data/
 external_drivers/
 
-# Local agent/session metadata and competition form attachments
+# 本地 agent 会话元数据和比赛附件
 AGENTS.md
 2026年全国大学生统计建模大赛附件/
+2023统计建模优秀论文合集/
 
-# Logs and temporary files
+# 日志和临时文件
 *.log
 *.tmp
 *.part
 .DS_Store
 
-# LaTeX/PDF build outputs
+# LaTeX/PDF 构建输出
 paper/build/

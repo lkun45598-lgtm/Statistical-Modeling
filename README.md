@@ -1,75 +1,75 @@
-# ReefCastNet: South China Sea Coral-Reef SST Forecasting
+# 南海海温增暖与海洋热浪风险评估
 
-This repository contains a complete, runnable codebase for:
+本仓库用于支撑论文《基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究》的数据处理、统计分析、图表生成和论文导出。当前研究重点为南海增暖与海洋热浪风险评估；仓库中只保留与本次论文复现直接相关的脚本和文档。
 
-**Task**: weekly South China Sea SST anomaly long-lead forecasting and coral-bleaching heat-stress evaluation.
+作者：Leizheng。
 
-**Main model**: `ReefCastNet-SimVP`, a SimVPv2-inspired spatiotemporal backbone modified for coral-reef heat-stress forecasting:
-- SST anomaly forecasting rather than raw SST only
-- reef-aware and reef-buffer-weighted loss
-- differentiable HotSpot / DHW loss
-- optional spatial Alert Level classification head
-- weekly 1/2/4/8/12/16 lead evaluation
+## 项目结构
 
-This codebase is self-contained. It does **not** vendor OpenSTL source code. Use OpenSTL/TAU/SwinLSTM/CAS-Canglong as external baselines if needed; see `docs/external_sota_baselines.md`.
-
-## 0. Install
-
-```bash
-conda create -n reefcast python=3.10 -y
-conda activate reefcast
-pip install -r requirements.txt
-pip install -e .
+```text
+paper/
+  main.tex                         # LaTeX 论文主文件
+  figures/                         # 论文使用的图件
+  tables/                          # 论文使用的 LaTeX 表格
+scripts/
+  20_prepare_ostia_scs.py          # 裁剪 OSTIA 南海日/月尺度数据
+  21_download_external_drivers.py  # 下载并整理气候指数和风场资料
+  30_build_monthly_sst_products.py # 构建月尺度 SST/SSTA 与趋势产品
+  31_make_monthly_sst_figures.py   # 生成月尺度图件
+  32_build_daily_mhw_products.py   # 识别日尺度海洋热浪事件
+  33_make_mhw_figures.py           # 生成 MHW 图件和趋势表
+  34_build_driver_analysis.py      # 构建驱动因子解释分析
+  35_build_word_paper.py           # 由 LaTeX 主文件导出 Word 论文
+  36_build_subregion_analysis.py   # 构建分区统计结果
+  37_build_robustness_analysis.py  # 构建稳健性和阈值敏感性分析
+  38_build_heat_risk_index.py      # 构建综合海洋热风险指数
+  39_make_paper_tables_figures.py  # 汇总论文图表资产
+docs/
+  final_submission_checklist.md    # 当前提交物检查清单
+  paper_style_reference_notes.md   # 优秀论文和格式参考说明
 ```
 
-For the current statistical-modeling workflow on this machine, use the existing
-conda environment:
+大型原始数据、裁剪数据和分析输出不提交到 git，默认保存在 `/data1/user/lz/osita_data/`。
+
+## 环境
+
+本机直接使用已有 conda 环境：
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python
 ```
 
-## Current competition direction
+若需要单独安装依赖：
 
-The current paper direction is **statistical modeling of South China Sea SST
-warming and marine heatwave risk**, not only SST forecasting. The forecasting
-code remains in the repository, but the active data products are:
+```bash
+pip install -r requirements.txt
+```
 
-- daily South China Sea OSTIA SST crop
-- monthly South China Sea OSTIA SST crop
-- climate-driver indices and NCEP/NCAR monthly wind fields
+## 数据范围
 
-Large generated data products are intentionally not committed to git.
+当前论文使用 OSTIA 日尺度高分辨率海表温度资料，研究区为：
 
-## Prepare OSTIA South China Sea data
+```text
+5°S--25°N, 100°E--125°E
+```
 
-Raw OSTIA/Copernicus file used locally:
+本地原始数据位置：
 
 ```text
 /data/sst_data/sst_missing_value_imputation/copernicus_data/copernicus_sst_monthly_1991_2021.nc
 ```
 
-Generate daily and monthly South China Sea Zarr products:
-
-```bash
-/home/lz/miniconda3/envs/pytorch/bin/python scripts/20_prepare_ostia_scs.py \
-  --output-dir /data1/user/lz/osita_data \
-  --workers 128
-```
-
-Main local outputs:
+本地裁剪和分析输出位置：
 
 ```text
-/data1/user/lz/osita_data/ostia_scs_daily.zarr
-/data1/user/lz/osita_data/ostia_scs_monthly.zarr
-/data1/user/lz/osita_data/metadata.json
+/data1/user/lz/osita_data/scs_5s25n/
 ```
 
-Default crop is `0-25N, 100-125E`, with SST converted from Kelvin to
-`degree_Celsius`.
+当前本地源数据存在三个不可用月份：`2014-07`、`2015-11`、`2015-12`。论文和脚本均采用保守处理：月尺度分析排除这些月份，日尺度 MHW 识别中缺失日打断连续事件，不进行插值。
 
-For the current full South China Sea statistical-modeling workflow, use the
-expanded crop `5S-25N, 100-125E`:
+## 复现流程
+
+### 1. 裁剪 OSTIA 南海数据
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/20_prepare_ostia_scs.py \
@@ -81,7 +81,7 @@ expanded crop `5S-25N, 100-125E`:
   --workers 128
 ```
 
-Current local full-region outputs:
+主要输出：
 
 ```text
 /data1/user/lz/osita_data/scs_5s25n/ostia_scs_daily.zarr
@@ -89,9 +89,7 @@ Current local full-region outputs:
 /data1/user/lz/osita_data/scs_5s25n/metadata.json
 ```
 
-## Build monthly statistical products
-
-Generate monthly SST anomaly, area-mean time series, and first-pass trend maps:
+### 2. 构建月尺度 SST/SSTA 产品
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/30_build_monthly_sst_products.py \
@@ -100,41 +98,12 @@ Generate monthly SST anomaly, area-mean time series, and first-pass trend maps:
   --overwrite
 ```
 
-This writes:
-
-```text
-/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_ssta.zarr
-/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_sst_trend.zarr
-/data1/user/lz/osita_data/scs_5s25n/analysis/scs_monthly_area_mean_sst_ssta.csv
-/data1/user/lz/osita_data/scs_5s25n/analysis/monthly_sst_summary.json
-```
-
-The default anomaly baseline is `1991-01-01` to `2020-12-31`. Area means use
-`cos(latitude)` weights and `ocean_mask == 1`.
-
-Known local data-quality note: the current local OSTIA/Copernicus source has
-three unusable months in the full South China Sea crop: `2014-07`, `2015-11`,
-and `2015-12`. The monthly products keep these months as missing values and
-exclude them from trend/correlation calculations rather than interpolating
-them.
-
-Generate first-pass monthly figures:
-
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/31_make_monthly_sst_figures.py \
   --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
 ```
 
-This writes publication-oriented PNG drafts under:
-
-```text
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/
-```
-
-## Build daily marine heatwave products
-
-Generate Hobday-style daily climatology, 90th-percentile threshold, and annual
-marine heatwave metrics:
+### 3. 构建日尺度 MHW 产品
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/32_build_daily_mhw_products.py \
@@ -145,156 +114,63 @@ marine heatwave metrics:
   --overwrite
 ```
 
-This writes:
-
-```text
-/data1/user/lz/osita_data/scs_5s25n/analysis/daily_climatology_threshold.zarr
-/data1/user/lz/osita_data/scs_5s25n/analysis/mhw_annual_metrics.zarr
-/data1/user/lz/osita_data/scs_5s25n/analysis/mhw_annual_area_mean.csv
-/data1/user/lz/osita_data/scs_5s25n/analysis/daily_mhw_summary.json
-```
-
-The first-pass MHW definition is: SST above the daily 90th percentile threshold
-for at least 5 consecutive valid days. Missing dates and all-NaN dates break
-events.
-
-Generate first-pass MHW figures and area-mean trend tables:
+主模型采用 Hobday 方法，使用逐日 90% 分位阈值，连续不少于 5 个有效日识别为一次海洋热浪事件。
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/33_make_mhw_figures.py \
   --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
 ```
 
-This writes:
-
-```text
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_area_mean_annual_timeseries.png
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_mean_total_days_1991_2021.png
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_total_days_trend_per_decade.png
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_cumulative_intensity_trend_per_decade.png
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/scs_mhw_mean_max_intensity_1991_2021.png
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_area_mean_trend_summary.csv
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_area_mean_trend_summary.json
-/data1/user/lz/osita_data/scs_5s25n/analysis/figures/mhw_figure_manifest.json
-```
-
-## Download external climate drivers
-
-Download and align the lightweight driver data used for explanatory modeling:
+### 4. 下载外部驱动因子
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/21_download_external_drivers.py \
   --output-dir /data1/user/lz/osita_data/external_drivers
 ```
 
-This fetches NOAA/PSL climate indices and NCEP/NCAR monthly 10 m winds, then
-builds:
+该脚本整理 NOAA/PSL 气候指数和 NCEP/NCAR 10 m 风场资料，供解释型回归分析使用。
 
-```text
-/data1/user/lz/osita_data/external_drivers/climate_indices_monthly_1991_2021.csv
-/data1/user/lz/osita_data/external_drivers/ncep_wind_scs_monthly.zarr
-/data1/user/lz/osita_data/external_drivers/ncep_wind_scs_region_mean.csv
-```
-
-## 1. Smoke test without NOAA data
+### 5. 构建分区、稳健性和综合风险结果
 
 ```bash
-python scripts/00_make_toy_data.py --config configs/toy.yaml
-python scripts/05_baselines.py --config configs/toy.yaml --baseline persistence --split test
-python scripts/03_train.py --config configs/toy.yaml
-python scripts/04_evaluate.py --config configs/toy.yaml --checkpoint outputs_toy/reefcastnet_simvp/best.pt --split test --save-npz
-python scripts/06_make_figures.py --npz outputs_toy/reefcastnet_simvp/examples_test.npz
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/34_build_driver_analysis.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis \
+  --drivers-dir /data1/user/lz/osita_data/external_drivers
 ```
-
-## 2. Download NOAA CRW CoralTemp SST
-
-First test with a short period:
 
 ```bash
-python scripts/01_download_noaa_crw.py --config configs/south_china_sea.yaml --years 2020 2021
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/36_build_subregion_analysis.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
 ```
-
-Full run:
 
 ```bash
-python scripts/01_download_noaa_crw.py --config configs/south_china_sea.yaml
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/37_build_robustness_analysis.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
 ```
-
-## 3. Build weekly dataset
 
 ```bash
-python scripts/02_build_weekly_dataset.py --config configs/south_china_sea.yaml
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/38_build_heat_risk_index.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis
 ```
 
-Output:
-
-```text
-data/processed/scs_weekly.zarr
-data/processed/metadata.json
-```
-
-## 4. Baselines
+### 6. 汇总论文图表
 
 ```bash
-python scripts/05_baselines.py --config configs/south_china_sea.yaml --baseline persistence --split test
-python scripts/05_baselines.py --config configs/south_china_sea.yaml --baseline climatology --split test
+/home/lz/miniconda3/envs/pytorch/bin/python scripts/39_make_paper_tables_figures.py \
+  --analysis-dir /data1/user/lz/osita_data/scs_5s25n/analysis \
+  --paper-dir paper
 ```
 
-## 5. Train ReefCastNet
+## 构建论文
 
-Single GPU:
-
-```bash
-python scripts/03_train.py --config configs/south_china_sea.yaml
-```
-
-8×4090 DDP:
-
-```bash
-torchrun --nproc_per_node=8 scripts/03_train.py --config configs/south_china_sea.yaml
-```
-
-## 6. Evaluate and plot
-
-```bash
-python scripts/04_evaluate.py \
-  --config configs/south_china_sea.yaml \
-  --checkpoint outputs/reefcastnet_simvp/best.pt \
-  --split test \
-  --save-npz
-
-python scripts/06_make_figures.py --npz outputs/reefcastnet_simvp/examples_test.npz
-```
-
-## What is actually original here?
-
-Do **not** claim that the generic backbone is invented from scratch. The safe statement is:
-
-> We use a SimVPv2-inspired spatiotemporal backbone and modify it into ReefCastNet by adding SST-anomaly formulation, reef-aware static inputs, reef-weighted loss, HotSpot/DHW-aware loss, and Alert Level risk supervision for coral bleaching heat-stress forecasting.
-
-## Final paper model table
-
-Recommended:
-- Persistence
-- Climatology
-- ConvLSTM
-- SimVPv2 / OpenSTL baseline
-- TAU / OpenSTL baseline
-- SwinLSTM baseline
-- ReefCastNet-SimVP (main)
-- CAS-Canglong as coarse S2S external reference only
-
-## Build the competition paper draft
-
-The current paper source is under `paper/`. Build the full version PDF,
-including the cover page:
+完整 PDF：
 
 ```bash
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   -outdir=paper/build paper/main.tex
 ```
 
-Build the anonymous PDF version, excluding the cover page:
+匿名 PDF：
 
 ```bash
 xelatex -interaction=nonstopmode -halt-on-error \
@@ -307,26 +183,28 @@ xelatex -interaction=nonstopmode -halt-on-error \
   '\def\ANONYMOUS{1}\input{paper/main.tex}'
 ```
 
-Current generated drafts:
-
-```text
-paper/build/main.pdf
-paper/build/main_anonymous.pdf
-```
-
-Build the full Word version required by the competition:
+Word 版本：
 
 ```bash
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/35_build_word_paper.py
 ```
 
-This writes:
+当前生成文件：
 
 ```text
+paper/build/main.pdf
+paper/build/main_anonymous.pdf
+paper/build/作品全文-组别-作品编号.pdf
+paper/build/匿名作品-组别-作品编号.pdf
 paper/build/作品全文-组别-作品编号.docx
 paper/build/full_paper.docx
 ```
 
-The Word table of contents is inserted as an updatable Word field. Open the
-document in Word/WPS and update fields before final submission so page numbers
-are refreshed.
+Word 目录为可更新域。最终提交前需要在 Word/WPS 中更新目录域，刷新页码。
+
+## 仓库提交原则
+
+- 只提交支撑当前论文的数据处理、分析、图表和导出代码。
+- 不提交旧预测模型、训练脚本、无关基线代码或大体积生成数据。
+- 代码注释使用中文，说明“为什么这样处理”和“关键口径是什么”，避免无意义注释。
+- 大型数据、模型输出、LaTeX 编译产物和本地比赛附件不进入 git。

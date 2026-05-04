@@ -70,8 +70,8 @@ def _write_zarr(ds: xr.Dataset, path: Path, chunks: dict[str, int], overwrite: b
 
 
 def _doy366(times: pd.DatetimeIndex) -> np.ndarray:
-    # Use a leap-year reference so March-December keep the same day index in
-    # leap and non-leap years. Feb 29 is retained as day 60.
+    # 使用闰年作为日序参考，保证 3 月至 12 月在闰年和非闰年中的日序一致。
+    # 2 月 29 日保留为第 60 天，避免阈值计算时季节窗口错位。
     return np.array([pd.Timestamp(f"2000-{ts:%m-%d}").dayofyear for ts in times], dtype=np.int16)
 
 
