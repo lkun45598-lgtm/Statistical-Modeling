@@ -1,5 +1,7 @@
 # Statistical Modeling Paper Upgrade Implementation Plan
 
+> **Archived planning record, not current submission guidance.** The current paper title is `基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究`; the current full paper has no separate thanks section, and the anonymous PDF removes only the cover page. Use `README.md`, `docs/final_submission_checklist.md`, `docs/paper_style_reference_notes.md`, `paper/main.tex`, and `scripts/35_build_word_paper.py` as the authoritative current sources.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Upgrade the existing South China Sea SST and marine-heatwave paper from a first-version technical report into a competition-ready statistical-modeling paper with stronger evidence, fuller writing, official-format deliverables, and a clear "excellent paper" style argument.
@@ -25,14 +27,14 @@
 - The current paper mostly reports results; it does not yet have enough model comparison, robustness checks, or subregional evidence.
 - The writing is correct but too flat. It lacks the layered argument usually expected in strong statistical-modeling papers: problem abstraction, indicator construction, model validation, mechanism explanation, and policy translation.
 - Mann-Kendall, Theil-Sen, threshold sensitivity, subregional contrasts, and a composite risk index are mentioned or implied but not yet fully computed and written.
-- The official format requires Word full version and PDF anonymous version. Anonymous PDF must remove cover page and acknowledgement, and must not expose school/team/teacher information outside allowed pages.
+- The official format requires Word full version and PDF anonymous version. Anonymous PDF must remove cover page, and must not expose school/team/teacher information outside allowed pages.
 
 **Official local requirements to preserve:**
 - Source files:
   - `/data1/user/lz/26-tongjijianmo/2026年全国大学生统计建模大赛附件/4  论文要素及格式要求（含封面页）.docx`
   - `/data1/user/lz/26-tongjijianmo/2026年全国大学生统计建模大赛附件/附件5 参赛须知.docx`
-- Word full version must contain eight parts: cover, abstract and keywords, table of contents, list of tables and figures, body, references, appendix, acknowledgement.
-- PDF anonymous version must remove cover and acknowledgement; the remaining six parts must be consistent with the Word full version.
+- Word full version must contain seven parts: cover, abstract and keywords, table of contents, list of tables and figures, body, references, and appendix.
+- PDF anonymous version must remove cover; the remaining parts must be consistent with the Word full version.
 - Required material names after the system produces the work number:
   - `作品全文-组别-作品编号.docx`
   - `匿名作品-组别-作品编号.pdf`
@@ -565,7 +567,7 @@ git commit -m "chore: assemble final paper assets"
 
 Preferred title:
 ```text
-基于高分辨率海温资料的南海增暖及海洋热浪风险统计建模研究
+基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究
 ```
 
 Rationale: shorter than the current title, still accurate, and avoids sounding like a data-processing report.
@@ -990,7 +992,7 @@ list of tables and figures
 main body
 references
 appendix
-acknowledgement
+no separate thanks section
 ```
 
 Table text must remain editable Word tables, not embedded images.
@@ -1037,7 +1039,7 @@ paper/build/作品全文-组别-作品编号.docx exists
 
 Run:
 ```bash
-/home/lz/miniconda3/envs/pytorch/bin/python -c "import fitz; p='paper/build/main_anonymous.pdf'; text=''.join(page.get_text() for page in fitz.open(p)); bad=['华南农业大学','参赛学校','参赛队员','指导老师','致谢','作品编号']; print({b: (b in text) for b in bad})"
+/home/lz/miniconda3/envs/pytorch/bin/python -c "import fitz; p='paper/build/main_anonymous.pdf'; text=''.join(page.get_text() for page in fitz.open(p)); bad=['华南农业大学','参赛学校','参赛队员','指导老师','thanks section','作品编号']; print({b: (b in text) for b in bad})"
 ```
 
 Expected:
@@ -1094,8 +1096,8 @@ Create `docs/final_submission_checklist.md`:
 - [ ] Main body
 - [ ] References
 - [ ] Appendix
-- [ ] Acknowledgement in Word full version
-- [ ] Cover and acknowledgement removed from anonymous PDF
+- [ ] Thanks section in Word full version
+- [ ] Cover removed from anonymous PDF
 
 ## Required Upload Materials
 - [ ] Word full version: `作品全文-组别-作品编号.docx`
@@ -1187,7 +1189,7 @@ Use this checklist whenever editing `paper/main.tex`:
 - [ ] The paper avoids presenting HRI as absolute ecological loss probability.
 - [ ] The paper keeps "not forecasting-first" clear: the contribution is statistical measurement, event modeling, robustness, and explanation.
 - [ ] The final recommendations are derived from this paper's results, not copied from general environmental-policy language.
-- [ ] The anonymous version contains no school, team-member, teacher, acknowledgement, or work-number information.
+- [ ] The anonymous version contains no school, team-member, teacher, thanks section, or work-number information.
 
 ---
 

@@ -1,10 +1,12 @@
 # Official Paper Excellent-Style Rewrite Implementation Plan
 
+> **Archived planning record, not current submission guidance.** The current paper title is `基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究`; the current full paper has no separate thanks section, and the anonymous PDF removes only the cover page. Use `README.md`, `docs/final_submission_checklist.md`, `docs/paper_style_reference_notes.md`, `paper/main.tex`, and `scripts/35_build_word_paper.py` as the authoritative current sources.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Keep the 2026 contest's official submission structure while rewriting the paper's body style and section logic to match the 2023 excellent-paper examples.
 
-**Architecture:** `paper/main.tex` remains the single authoritative paper source for PDF builds. The official full version keeps the eight required parts, and the anonymous PDF removes only the cover and acknowledgement. The writing style changes are limited to title numbering, section organization, abstract/introduction phrasing, and result-discussion logic; computed tables, figures, and quantitative conclusions remain unchanged.
+**Architecture:** `paper/main.tex` remains the single authoritative paper source for PDF builds. The official full version keeps the seven current parts, and the anonymous PDF removes only the cover. The writing style changes are limited to title numbering, section organization, abstract/introduction phrasing, and result-discussion logic; computed tables, figures, and quantitative conclusions remain unchanged.
 
 **Tech Stack:** XeLaTeX/ctex, Python `python-docx` exporter, PyMuPDF verification, existing generated figures and LaTeX tables.
 
@@ -14,7 +16,7 @@
 
 - Modify: `paper/main.tex`
   - Add official Chinese section numbering: `一、` and `（一）`.
-  - Keep cover, abstract, contents, list of tables/figures, body, references, appendix, and acknowledgement.
+  - Keep cover, abstract, contents, list of tables/figures, body, references, and appendix; do not add a separate thanks section.
   - Rewrite body headings and paragraphs to follow excellent-paper logic: problem framing, model design, empirical analysis, robustness, mechanism explanation, conclusions and policy suggestions.
 - Modify: `scripts/35_build_word_paper.py`
   - Ensure the Word exporter still reads section/subsection headings and table macros after the LaTeX style change.
@@ -34,7 +36,7 @@
 Write notes covering:
 
 ```text
-2023 excellent papers usually start with title, author line, abstract, keywords, and direct entry into "一、引言"; they use Chinese section hierarchy and dense result-oriented paragraphs. The 2026 official attachment, however, requires Word full version with eight parts and anonymous PDF with six parts. Therefore, this project keeps the official parts but rewrites the body to excellent-paper style.
+2023 excellent papers usually start with title, author line, abstract, keywords, and direct entry into "一、引言"; they use Chinese section hierarchy and dense result-oriented paragraphs. The 2026 official attachment, however, requires Word full version with seven parts and anonymous PDF with remaining parts. Therefore, this project keeps the official parts but rewrites the body to excellent-paper style.
 ```
 
 - [ ] **Step 2: Commit style notes with paper rewrite**
@@ -137,7 +139,7 @@ Run:
 /home/lz/miniconda3/envs/pytorch/bin/python scripts/35_build_word_paper.py --tex paper/main.tex --output paper/build/作品全文-组别-作品编号.docx
 ```
 
-Expected: Word still has cover, abstract, contents, figure/table list, body, references, appendix, acknowledgement, 10 tables, and 16 images.
+Expected: Word still has cover, abstract, contents, figure/table list, body, references, appendix, 10 tables, and 16 images.
 
 - [ ] **Step 2: Patch exporter only if parsing fails**
 
@@ -185,7 +187,7 @@ Expected: exit code 0 and `paper/build/作品全文-组别-作品编号.docx` ex
 Run:
 
 ```bash
-/home/lz/miniconda3/envs/pytorch/bin/python -c "import fitz; p='paper/build/main_anonymous.pdf'; text=''.join(page.get_text() for page in fitz.open(p)); bad=['华南农业大学','参赛学校','参赛队员','指导老师','致谢','作品编号','TJJM2026']; print({b:(b in text) for b in bad})"
+/home/lz/miniconda3/envs/pytorch/bin/python -c "import fitz; p='paper/build/main_anonymous.pdf'; text=''.join(page.get_text() for page in fitz.open(p)); bad=['华南农业大学','参赛学校','参赛队员','指导老师','thanks section','作品编号','TJJM2026']; print({b:(b in text) for b in bad})"
 ```
 
 Expected: all values are `False`.

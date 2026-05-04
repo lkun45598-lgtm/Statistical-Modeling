@@ -1,5 +1,7 @@
 # Statistical Modeling Paper Implementation Plan
 
+> **Archived planning record, not current submission guidance.** The current paper title is `基于高分辨率海温资料的南海增暖及海洋热浪风险评估研究`; the current full paper has no separate thanks section, and the anonymous PDF removes only the cover page. Use `README.md`, `docs/final_submission_checklist.md`, `docs/paper_style_reference_notes.md`, `paper/main.tex`, and `scripts/35_build_word_paper.py` as the authoritative current sources.
+
 > Superseded for the paper-upgrade phase by `docs/superpowers/plans/2026-05-03-statistical-modeling-paper-upgrade.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -88,7 +90,7 @@ Create `paper/references.bib` with references for OSTIA, marine heatwave definit
 
 - [ ] **Step 1: Build document structure**
 
-Use `ctexart` with A4 paper and margins matching the competition requirement. Include title, Chinese abstract, keywords, table of contents, list of tables, list of figures, body sections, references, appendix, and optional acknowledgement.
+Use `ctexart` with A4 paper and margins matching the competition requirement. Include title, Chinese abstract, keywords, table of contents, list of tables, list of figures, body sections, references, and appendix; do not add a separate thanks section.
 
 - [ ] **Step 2: Write full first-version body**
 

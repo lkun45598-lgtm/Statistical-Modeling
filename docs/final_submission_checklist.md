@@ -9,7 +9,7 @@
 - [x] Main body
 - [x] References
 - [x] Appendix
-- [x] No separate acknowledgement section
+- [x] No separate thanks section
 - [x] Cover removed from anonymous PDF
 
 ## Generated Paper Files
@@ -25,7 +25,7 @@
 - [x] Full PDF build completed from `paper/main.tex`
 - [x] Anonymous PDF build completed from the same `paper/main.tex`
 - [x] Word build completed with `scripts/35_build_word_paper.py`
-- [x] Anonymous PDF text scan found no school, team-member, teacher, acknowledgement, work-number, or `TJJM2026` leakage
+- [x] Anonymous PDF text scan found no school, team-member, teacher, thanks-section, work-number, or `TJJM2026` leakage
 - [x] Word structure check found 230 paragraphs, 10 editable tables, and 16 embedded images
 - [x] Body density check found 15244 cleaned body characters
 - [x] LaTeX log scan found no overfull boxes, undefined references, or undefined citation warnings

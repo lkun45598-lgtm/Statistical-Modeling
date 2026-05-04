@@ -15,7 +15,7 @@ The folder `2023统计建模优秀论文合集/` contains 14 excellent-paper PDF
 
 ## Official 2026 Constraints
 
-The current submission package follows the 2026 contest attachment structure while omitting a separate acknowledgement section to match the excellent-paper examples:
+The current submission package follows the 2026 contest attachment structure while omitting a separate thanks section to match the excellent-paper examples:
 
 - Word full version contains seven parts: cover, abstract and keywords, table of contents, list of tables and figures, body, references, and appendix.
 - Anonymous PDF removes only the cover, while the remaining parts must match the Word full version.

@@ -286,8 +286,8 @@ Recommended:
 
 ## Build the competition paper draft
 
-The current statistical-modeling paper source is under `paper/`. Build the full
-version PDF, including the cover page:
+The current paper source is under `paper/`. Build the full version PDF,
+including the cover page:
 
 ```bash
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
