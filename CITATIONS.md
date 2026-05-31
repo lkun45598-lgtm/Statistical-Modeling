@@ -8,5 +8,8 @@
 - Smale 等关于海洋热浪生态影响的研究。
 - NOAA/PSL 气候指数：Niño 3.4、PDO、DMI、SOI。
 - NCEP/NCAR Reanalysis 1：10 m 纬向和经向风场。
+- Little 和 Rubin 关于缺失数据敏感性分析的经典教材。
+- Schafer 和 Graham 关于缺失数据处理的综述。
+- Nardo 等关于综合指标构建与权重敏感性的手册。
 
 论文正文中的正式引用以 `paper/main.tex` 的参考文献列表为准。

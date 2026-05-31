@@ -67,6 +67,8 @@ pip install -r requirements.txt
 
 当前本地源数据存在三个不可用月份：`2014-07`、`2015-11`、`2015-12`。论文和脚本均采用保守处理：月尺度分析排除这些月份，日尺度 MHW 识别中缺失日打断连续事件，不进行插值。
 
+`scripts/20_prepare_ostia_scs.py` 既可以直接接收上述 `.nc` 文件，也可以接收包含该文件的目录；如果你传入的是 `/data/sst_data/sst_missing_value_imputation/ostia/`，脚本会自动回退到同级 `copernicus_data/` 下的原始文件。`ostia/` 目录本身主要是辅助脚本、Notebook 和示意图，不是这份原始 nc 文件本体。
+
 ## 复现流程
 
 ### 1. 裁剪 OSTIA 南海数据

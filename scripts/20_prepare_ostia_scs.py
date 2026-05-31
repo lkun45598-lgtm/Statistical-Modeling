@@ -31,6 +31,26 @@ def _maybe_remove(path: Path, overwrite: bool) -> None:
         path.unlink()
 
 
+def _resolve_input_path(path: Path) -> Path:
+    if path.is_file():
+        return path
+    if path.is_dir():
+        preferred = path / "copernicus_sst_monthly_1991_2021.nc"
+        if preferred.exists():
+            return preferred
+        sibling = path.parent / "copernicus_data" / "copernicus_sst_monthly_1991_2021.nc"
+        if sibling.exists():
+            return sibling
+        nc_files = sorted(path.glob("*.nc"))
+        if len(nc_files) == 1:
+            return nc_files[0]
+        if nc_files:
+            raise FileNotFoundError(
+                f"Directory {path} contains multiple .nc files; please pass the target file explicitly."
+            )
+    raise FileNotFoundError(f"Could not resolve OSTIA input path: {path}")
+
+
 def _coord_name(ds: xr.Dataset, names: tuple[str, ...]) -> str:
     for name in names:
         if name in ds.coords:
@@ -101,7 +121,7 @@ def _sample_stats(ds: xr.Dataset) -> dict[str, Any]:
 
 
 def prepare(args: argparse.Namespace) -> None:
-    input_path = Path(args.input)
+    input_path = _resolve_input_path(Path(args.input))
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 

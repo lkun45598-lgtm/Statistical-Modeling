@@ -20,12 +20,31 @@ from scipy import stats
 DEFAULT_ANALYSIS_DIR = Path("/data1/user/lz/osita_data/scs_5s25n/analysis")
 DEFAULT_EXTERNAL_DIR = Path("/data1/user/lz/osita_data/external_drivers")
 DEFAULT_OUTPUT_DIR = DEFAULT_ANALYSIS_DIR / "driver_analysis"
+DEFAULT_PAPER_DIR = Path("paper")
 
 CLIMATE_VARS = ["nino34_cpc_3m_centered", "pdo", "dmi", "soi"]
 WIND_VARS = ["u10", "v10", "wind_speed", "wind_speed_anom"]
 MONTHLY_DRIVER_VARS = CLIMATE_VARS + WIND_VARS
 ANNUAL_DRIVER_VARS = CLIMATE_VARS + ["u10", "v10", "wind_speed_anom"]
 MHW_TARGETS = ["mhw_frequency", "mhw_total_days", "mhw_max_intensity", "mhw_cumulative_intensity"]
+
+
+def _fmt(value: float, digits: int = 3) -> str:
+    if value is None or not np.isfinite(value):
+        return "--"
+    return f"{value:.{digits}f}"
+
+
+def _p_text(value: float) -> str:
+    if value is None or not np.isfinite(value):
+        return "--"
+    if value < 0.001:
+        return "$p<0.001$"
+    if value < 0.01:
+        return "$p<0.01$"
+    if value < 0.05:
+        return "$p<0.05$"
+    return "$p\\geq0.05$"
 
 
 def _maybe_reset_output_dir(path: Path, overwrite: bool) -> None:
@@ -266,10 +285,126 @@ def _json_safe(value: Any) -> Any:
     return value
 
 
+def _wind_conclusion(coef: float | None, p_value: float | None) -> str:
+    if coef is None or p_value is None or not np.isfinite(coef) or not np.isfinite(p_value):
+        return "未纳入风速"
+    if coef < 0 and p_value < 0.05:
+        return "负向显著"
+    if coef < 0:
+        return "负向不显著"
+    if p_value < 0.05:
+        return "正向显著"
+    return "方向不稳定"
+
+
+def _robustness_rows_for_target(
+    df: pd.DataFrame,
+    target: str,
+    target_label: str,
+    wind_term: str,
+    variants: list[tuple[str, list[str]]],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for model_label, predictors in variants:
+        coef_df, summary, _ = _ols_standardized(df, target, predictors)
+        wind = coef_df.loc[coef_df["term"] == wind_term]
+        if wind.empty:
+            wind_coef: float | None = None
+            wind_p: float | None = None
+        else:
+            wind_row = wind.iloc[0]
+            wind_coef = float(wind_row["coef_standardized"])
+            wind_p = float(wind_row["p_value"])
+        rows.append(
+            {
+                "target": target,
+                "target_label": target_label,
+                "model_label": model_label,
+                "predictor_count": len(predictors),
+                "n": summary["n"],
+                "adj_r2": summary["adj_r2"],
+                "wind_coef": wind_coef,
+                "wind_p_value": wind_p,
+                "conclusion": _wind_conclusion(wind_coef, wind_p),
+            }
+        )
+    return rows
+
+
+def _build_driver_robustness(
+    monthly_model: pd.DataFrame,
+    annual: pd.DataFrame,
+    output_dir: Path,
+    paper_dir: Path,
+) -> pd.DataFrame:
+    monthly_variants = [
+        ("基准模型", ["nino34_cpc_3m_centered_lag3", "pdo_lag0", "dmi_lag0", "wind_speed_anom_lag0"]),
+        ("删去Niño3.4", ["pdo_lag0", "dmi_lag0", "wind_speed_anom_lag0"]),
+        ("删去PDO", ["nino34_cpc_3m_centered_lag3", "dmi_lag0", "wind_speed_anom_lag0"]),
+        ("删去DMI", ["nino34_cpc_3m_centered_lag3", "pdo_lag0", "wind_speed_anom_lag0"]),
+        ("删去风速距平", ["nino34_cpc_3m_centered_lag3", "pdo_lag0", "dmi_lag0"]),
+    ]
+    annual_variants = [
+        ("基准模型", ["nino34_cpc_3m_centered", "pdo", "dmi", "wind_speed_anom"]),
+        ("删去Niño3.4", ["pdo", "dmi", "wind_speed_anom"]),
+        ("删去PDO", ["nino34_cpc_3m_centered", "dmi", "wind_speed_anom"]),
+        ("删去DMI", ["nino34_cpc_3m_centered", "pdo", "wind_speed_anom"]),
+        ("删去风速距平", ["nino34_cpc_3m_centered", "pdo", "dmi"]),
+    ]
+    rows = [
+        *_robustness_rows_for_target(
+            monthly_model,
+            "ssta_area_mean_c",
+            "月尺度SSTA",
+            "wind_speed_anom_lag0",
+            monthly_variants,
+        ),
+        *_robustness_rows_for_target(
+            annual,
+            "mhw_total_days",
+            "年度MHW总天数",
+            "wind_speed_anom",
+            annual_variants,
+        ),
+    ]
+    df = pd.DataFrame(rows)
+    csv_path = output_dir / "driver_factor_robustness.csv"
+    df.to_csv(csv_path, index=False)
+    print(f"[write] {csv_path}")
+
+    table_path = paper_dir / "tables" / "driver_robustness_table.tex"
+    _write_driver_robustness_table(df, table_path)
+    return df
+
+
+def _write_driver_robustness_table(df: pd.DataFrame, path: Path) -> None:
+    lines = [
+        r"\begin{tabular}{llccccc}",
+        r"\hline",
+        r"响应变量 & 模型设定 & 变量数 & $n$ & 调整$R^2$ & 风速系数 & 风速$p$值 \\",
+        r"\hline",
+    ]
+    for row in df.itertuples(index=False):
+        lines.append(
+            f"{row.target_label} & "
+            f"{row.model_label} & "
+            f"{int(row.predictor_count)} & "
+            f"{int(row.n)} & "
+            f"{_fmt(row.adj_r2)} & "
+            f"{_fmt(row.wind_coef)} & "
+            f"{_p_text(row.wind_p_value)} \\\\"
+        )
+    lines.extend([r"\hline", r"\end{tabular}", ""])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"[write] {path}")
+
+
 def build_driver_analysis(args: argparse.Namespace) -> None:
     analysis_dir = Path(args.analysis_dir)
     external_dir = Path(args.external_dir)
     output_dir = Path(args.output_dir)
+    paper_dir = Path(args.paper_dir)
     _maybe_reset_output_dir(output_dir, args.overwrite)
 
     monthly = _load_monthly_inputs(analysis_dir, external_dir)
@@ -307,6 +442,8 @@ def build_driver_analysis(args: argparse.Namespace) -> None:
         index=False,
     )
     print(f"[write] {output_dir / 'annual_mhw_total_days_driver_regression.csv'}")
+
+    robustness_df = _build_driver_robustness(monthly_model, annual, output_dir, paper_dir)
 
     figures = {
         "monthly_ssta_driver_fit": _plot_fit(
@@ -356,6 +493,7 @@ def build_driver_analysis(args: argparse.Namespace) -> None:
         "annual_predictors": annual_predictors,
         "top_monthly_correlations": best_monthly.head(8).to_dict(orient="records"),
         "top_annual_correlations": annual_corr.sort_values("abs_r", ascending=False).head(12).to_dict(orient="records"),
+        "driver_factor_robustness": robustness_df.to_dict(orient="records"),
         "figures": figures,
     }
     summary_path = output_dir / "driver_analysis_summary.json"
@@ -370,6 +508,7 @@ def main() -> None:
     parser.add_argument("--analysis-dir", default=str(DEFAULT_ANALYSIS_DIR))
     parser.add_argument("--external-dir", default=str(DEFAULT_EXTERNAL_DIR))
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
+    parser.add_argument("--paper-dir", default=str(DEFAULT_PAPER_DIR))
     parser.add_argument("--max-lag", type=int, default=6)
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()

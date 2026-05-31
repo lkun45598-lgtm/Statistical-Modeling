@@ -187,6 +187,7 @@ def _build_robust_trends(analysis_dir: Path, output_dir: Path) -> tuple[pd.DataF
             {
                 "target": target.key,
                 "label_zh": target.label_zh,
+                "unit": target.unit,
                 "main_n": int(main_row["n"]),
                 "complete_year_n": int(complete_stats["n"]),
                 "main_ols_slope_per_decade": float(main_row["ols_slope_per_decade"]),
@@ -344,6 +345,28 @@ def _write_threshold_table(df: pd.DataFrame, path: Path) -> None:
     print(f"[write] {path}")
 
 
+def _write_missing_table(df: pd.DataFrame, path: Path) -> None:
+    lines = [
+        r"\begin{tabular}{lccccc}",
+        r"\hline",
+        r"指标 & 单位 & 主模型$n$ & 完整年份$n$ & 主模型趋势 & 完整年份趋势 \\",
+        r"\hline",
+    ]
+    for row in df.itertuples(index=False):
+        lines.append(
+            f"{row.label_zh} & "
+            f"{row.unit} & "
+            f"{int(row.main_n)} & "
+            f"{int(row.complete_year_n)} & "
+            f"{_fmt(row.main_ols_slope_per_decade)} & "
+            f"{_fmt(row.complete_year_ols_slope_per_decade)} \\\\"
+        )
+    lines.extend([r"\hline", r"\end{tabular}", ""])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"[write] {path}")
+
+
 def _save(fig: plt.Figure, path: Path) -> dict[str, Any]:
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=300, bbox_inches="tight", facecolor="white")
@@ -413,6 +436,7 @@ def build_robustness(args: argparse.Namespace) -> None:
     threshold_df = _build_threshold_sensitivity(args)
 
     _write_robust_table(robust_df, paper_dir / "tables" / "robust_trend_table.tex")
+    _write_missing_table(missing_df, paper_dir / "tables" / "missing_month_sensitivity_table.tex")
     _write_threshold_table(threshold_df, paper_dir / "tables" / "threshold_sensitivity_table.tex")
     robust_fig = _plot_robust_trends(robust_df, paper_dir / "figures" / "robust_trend_comparison.png")
     threshold_fig = _plot_threshold_sensitivity(threshold_df, paper_dir / "figures" / "mhw_threshold_sensitivity.png")
