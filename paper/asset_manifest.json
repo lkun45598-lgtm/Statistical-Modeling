@@ -148,6 +148,13 @@
       "bytes": 577
     },
     {
+      "id": "tab:missing_sensitivity",
+      "path": "paper/tables/missing_month_sensitivity_table.tex",
+      "caption": "缺失月份敏感性检验",
+      "exists": true,
+      "bytes": 395
+    },
+    {
       "id": "tab:threshold",
       "path": "paper/tables/threshold_sensitivity_table.tex",
       "caption": "MHW 阈值敏感性检验",
@@ -160,6 +167,13 @@
       "caption": "南海分区相对综合海洋热风险指数",
       "exists": true,
       "bytes": 482
+    },
+    {
+      "id": "tab:hri_weight",
+      "path": "paper/tables/hri_weight_sensitivity_table.tex",
+      "caption": "HRI 权重敏感性检验",
+      "exists": true,
+      "bytes": 622
     },
     {
       "id": "tab:driver_lag",
@@ -188,6 +202,13 @@
       "caption": "驱动因子解释模型拟合优度",
       "exists": true,
       "bytes": 206
+    },
+    {
+      "id": "tab:driver_robust",
+      "path": "paper/tables/driver_robustness_table.tex",
+      "caption": "关联因子稳健性检验",
+      "exists": true,
+      "bytes": 862
     }
   ],
   "missing": []

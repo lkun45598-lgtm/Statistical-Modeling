@@ -18,6 +18,7 @@ import pandas as pd
 import xarray as xr
 from matplotlib.colors import BoundaryNorm, ListedColormap
 from numcodecs import Blosc
+from scipy.stats import spearmanr
 
 
 DEFAULT_ANALYSIS_DIR = "/data1/user/lz/osita_data/scs_5s25n/analysis"
@@ -50,6 +51,66 @@ COMPONENT_LABELS = {
     "mhw_total_days_trend_scaled": "总天数趋势",
     "mhw_cumulative_intensity_trend_scaled": "累计强度趋势",
 }
+
+WEIGHT_COMPONENT_ORDER = [
+    "ssta_trend_scaled",
+    "mhw_total_days_mean_scaled",
+    "mhw_total_days_trend_scaled",
+    "mhw_cumulative_intensity_trend_scaled",
+]
+
+WEIGHT_SENSITIVITY_SCHEMES = [
+    (
+        "equal",
+        "等权基准",
+        {
+            "ssta_trend_scaled": 0.25,
+            "mhw_total_days_mean_scaled": 0.25,
+            "mhw_total_days_trend_scaled": 0.25,
+            "mhw_cumulative_intensity_trend_scaled": 0.25,
+        },
+    ),
+    (
+        "drop_ssta_trend",
+        "去除增暖趋势",
+        {
+            "ssta_trend_scaled": 0.0,
+            "mhw_total_days_mean_scaled": 1.0 / 3.0,
+            "mhw_total_days_trend_scaled": 1.0 / 3.0,
+            "mhw_cumulative_intensity_trend_scaled": 1.0 / 3.0,
+        },
+    ),
+    (
+        "drop_exposure_mean",
+        "去除暴露均值",
+        {
+            "ssta_trend_scaled": 1.0 / 3.0,
+            "mhw_total_days_mean_scaled": 0.0,
+            "mhw_total_days_trend_scaled": 1.0 / 3.0,
+            "mhw_cumulative_intensity_trend_scaled": 1.0 / 3.0,
+        },
+    ),
+    (
+        "drop_total_days_trend",
+        "去除天数趋势",
+        {
+            "ssta_trend_scaled": 1.0 / 3.0,
+            "mhw_total_days_mean_scaled": 1.0 / 3.0,
+            "mhw_total_days_trend_scaled": 0.0,
+            "mhw_cumulative_intensity_trend_scaled": 1.0 / 3.0,
+        },
+    ),
+    (
+        "drop_cumulative_trend",
+        "去除强度趋势",
+        {
+            "ssta_trend_scaled": 1.0 / 3.0,
+            "mhw_total_days_mean_scaled": 1.0 / 3.0,
+            "mhw_total_days_trend_scaled": 1.0 / 3.0,
+            "mhw_cumulative_intensity_trend_scaled": 0.0,
+        },
+    ),
+]
 
 
 def _maybe_remove(path: Path, overwrite: bool) -> None:
@@ -121,6 +182,26 @@ def _weighted_share(mask: xr.DataArray, weights: xr.DataArray) -> float:
     return float(numerator / denominator)
 
 
+def _weighted_spearman(reference: xr.DataArray, candidate: xr.DataArray, mask: xr.DataArray) -> float:
+    ref_values = reference.where(mask == 1).values.ravel()
+    cand_values = candidate.where(mask == 1).values.ravel()
+    valid = np.isfinite(ref_values) & np.isfinite(cand_values)
+    if valid.sum() < 3:
+        return float("nan")
+    result = spearmanr(ref_values[valid], cand_values[valid])
+    return float(result.correlation) if np.isfinite(result.correlation) else float("nan")
+
+
+def _series_spearman(reference: list[float], candidate: list[float]) -> float:
+    ref = np.asarray(reference, dtype="float64")
+    cand = np.asarray(candidate, dtype="float64")
+    valid = np.isfinite(ref) & np.isfinite(cand)
+    if valid.sum() < 3:
+        return float("nan")
+    result = spearmanr(ref[valid], cand[valid])
+    return float(result.correlation) if np.isfinite(result.correlation) else float("nan")
+
+
 def _application_text(mean_hri: float, high_share: float) -> str:
     if high_share >= 0.35 or mean_hri >= 0.66:
         return "优先监测"
@@ -166,6 +247,108 @@ def _write_table(df: pd.DataFrame, path: Path) -> None:
             f"{_fmt(row.high_risk_share * 100.0, 1)}\\% & "
             f"{row.dominant_component_zh} & "
             f"{row.application_meaning} \\\\"
+        )
+    lines.extend([r"\hline", r"\end{tabular}", ""])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"[write] {path}")
+
+
+def _normalize_scheme_weights(raw_weights: dict[str, float], valid_names: list[str]) -> dict[str, float]:
+    weights = {
+        name: (float(raw_weights.get(name, 0.0)) if name in valid_names else 0.0)
+        for name in WEIGHT_COMPONENT_ORDER
+    }
+    total = sum(weights.values())
+    if total <= 0:
+        return {name: 0.0 for name in weights}
+    return {name: value / total for name, value in weights.items()}
+
+
+def _combine_hri(
+    scaled_components: dict[str, xr.DataArray],
+    weights: dict[str, float],
+    ocean_mask: xr.DataArray,
+) -> xr.DataArray:
+    hri = None
+    for name in WEIGHT_COMPONENT_ORDER:
+        if name not in scaled_components:
+            continue
+        weight = float(weights.get(name, 0.0))
+        if weight == 0.0:
+            continue
+        term = scaled_components[name] * weight
+        hri = term if hri is None else hri + term
+    if hri is None:
+        hri = xr.full_like(ocean_mask, np.nan, dtype="float32")
+    return hri.where(ocean_mask == 1).astype("float32")
+
+
+def _weight_vector_text(weights: dict[str, float]) -> str:
+    return "/".join(_fmt(float(weights.get(name, 0.0)), 2) for name in WEIGHT_COMPONENT_ORDER)
+
+
+def _build_weight_sensitivity(
+    scaled_components: dict[str, xr.DataArray],
+    valid_names: list[str],
+    ocean_mask: xr.DataArray,
+    weights_all: xr.DataArray,
+    baseline_hri: xr.DataArray,
+) -> pd.DataFrame:
+    baseline_region_rows: list[tuple[str, float]] = []
+    for region in SUBREGIONS:
+        r_mask = _region_mask(ocean_mask, region)
+        r_weights = weights_all.where(r_mask == 1, 0.0)
+        baseline_region_rows.append((region.name_zh, _weighted_mean(baseline_hri, r_weights)))
+    baseline_region_means = [value for _, value in baseline_region_rows]
+
+    rows: list[dict[str, Any]] = []
+    for scheme_id, scheme_name, raw_weights in WEIGHT_SENSITIVITY_SCHEMES:
+        scheme_weights = _normalize_scheme_weights(raw_weights, valid_names)
+        hri_alt = _combine_hri(scaled_components, scheme_weights, ocean_mask).compute()
+        high_share = _weighted_share((hri_alt >= 0.66).where(ocean_mask == 1, False), weights_all)
+
+        region_rows: list[tuple[str, float]] = []
+        for region in SUBREGIONS:
+            r_mask = _region_mask(ocean_mask, region)
+            r_weights = weights_all.where(r_mask == 1, 0.0)
+            region_rows.append((region.name_zh, _weighted_mean(hri_alt, r_weights)))
+        region_names = [name for name, _ in region_rows]
+        region_means = [value for _, value in region_rows]
+        top_index = int(np.nanargmax(np.asarray(region_means, dtype="float64")))
+
+        rows.append(
+            {
+                "scheme_id": scheme_id,
+                "scheme_name": scheme_name,
+                "weight_vector": _weight_vector_text(scheme_weights),
+                "grid_spearman_vs_equal": _weighted_spearman(baseline_hri, hri_alt, ocean_mask),
+                "subregion_spearman_vs_equal": _series_spearman(baseline_region_means, region_means),
+                "top_region": region_names[top_index],
+                "north_shelf_mean_hri": region_means[0],
+                "high_risk_share": high_share,
+                **{f"{name}_weight": scheme_weights.get(name, 0.0) for name in WEIGHT_COMPONENT_ORDER},
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def _write_weight_sensitivity_table(df: pd.DataFrame, path: Path) -> None:
+    lines = [
+        r"\begin{tabular}{lcccccc}",
+        r"\hline",
+        r"权重方案 & 权重向量 & 网格$\rho$ & 分区$\rho$ & 最高分区 & 北部陆架HRI & 高风险占比 \\",
+        r"\hline",
+    ]
+    for row in df.itertuples(index=False):
+        lines.append(
+            f"{row.scheme_name} & "
+            f"{row.weight_vector} & "
+            f"{_fmt(row.grid_spearman_vs_equal)} & "
+            f"{_fmt(row.subregion_spearman_vs_equal)} & "
+            f"{row.top_region} & "
+            f"{_fmt(row.north_shelf_mean_hri)} & "
+            f"{_fmt(row.high_risk_share * 100.0, 1)}\\% \\\\"
         )
     lines.extend([r"\hline", r"\end{tabular}", ""])
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -301,9 +484,18 @@ def build_heat_risk_index(args: argparse.Namespace) -> None:
         )
 
     summary_df = pd.DataFrame(rows)
+    sensitivity_df = _build_weight_sensitivity(
+        scaled_components,
+        valid_names,
+        ocean_mask,
+        weights_all,
+        hri_summary,
+    )
     summary_csv = output_dir / "heat_risk_subregion_summary.csv"
+    sensitivity_csv = output_dir / "hri_weight_sensitivity.csv"
     summary_json = output_dir / "heat_risk_index_summary.json"
     summary_df.to_csv(summary_csv, index=False)
+    sensitivity_df.to_csv(sensitivity_csv, index=False)
     summary_json.write_text(
         json.dumps(
             {
@@ -313,6 +505,7 @@ def build_heat_risk_index(args: argparse.Namespace) -> None:
                 "component_weights": component_weights,
                 "scale_metadata": scale_metadata,
                 "subregions": summary_df.to_dict(orient="records"),
+                "weight_sensitivity": sensitivity_df.to_dict(orient="records"),
             },
             ensure_ascii=False,
             indent=2,
@@ -320,11 +513,14 @@ def build_heat_risk_index(args: argparse.Namespace) -> None:
         encoding="utf-8",
     )
     print(f"[write] {summary_csv}")
+    print(f"[write] {sensitivity_csv}")
     print(f"[write] {summary_json}")
 
     table_path = paper_dir / "tables" / "heat_risk_index_table.tex"
+    sensitivity_table_path = paper_dir / "tables" / "hri_weight_sensitivity_table.tex"
     figure_path = paper_dir / "figures" / "heat_risk_index_map.png"
     _write_table(summary_df, table_path)
+    _write_weight_sensitivity_table(sensitivity_df, sensitivity_table_path)
     fig_info = _plot_hri(hri_summary, figure_path)
     print(f"[ok] {fig_info['path']} ({fig_info['bytes']} bytes)")
 

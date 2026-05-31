@@ -41,12 +41,15 @@ TABLES = [
     ("tab:trend", "tables/trend_summary_table.tex", "区域平均增暖和海洋热浪风险趋势摘要"),
     ("tab:subregion", "tables/subregion_summary_table.tex", "南海分区增暖与海洋热浪趋势摘要"),
     ("tab:robust", "tables/robust_trend_table.tex", "主要指标趋势稳健性检验"),
+    ("tab:missing_sensitivity", "tables/missing_month_sensitivity_table.tex", "缺失月份敏感性检验"),
     ("tab:threshold", "tables/threshold_sensitivity_table.tex", "MHW 阈值敏感性检验"),
     ("tab:hri", "tables/heat_risk_index_table.tex", "南海分区相对综合海洋热风险指数"),
+    ("tab:hri_weight", "tables/hri_weight_sensitivity_table.tex", "HRI 权重敏感性检验"),
     ("tab:driver_lag", "tables/monthly_driver_best_lag_table.tex", "月尺度 SSTA 与驱动因子的最强滞后相关"),
     ("tab:monthly_driver", "tables/monthly_driver_regression_table.tex", "月尺度 SSTA 标准化解释模型"),
     ("tab:annual_driver", "tables/annual_driver_regression_table.tex", "年度 MHW 总天数标准化解释模型"),
     ("tab:driver_summary", "tables/driver_model_summary_table.tex", "驱动因子解释模型拟合优度"),
+    ("tab:driver_robust", "tables/driver_robustness_table.tex", "关联因子稳健性检验"),
 ]
 
 
